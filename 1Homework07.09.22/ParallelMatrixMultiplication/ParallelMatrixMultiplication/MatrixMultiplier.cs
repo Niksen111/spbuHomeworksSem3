@@ -29,11 +29,12 @@ public static class MatrixMultiplier
         for (int index = 0; index < ThreadsCount; ++index)
         {
             var i = index;
+            _threadsActions.Add(((-1, -1), (-1, -1)));
             _threads[i] = new Thread(() =>
             {
                 while (true)
                 {
-                    while (_threadsActions[i].end.row < 0)
+                    while (_threadsActions[i].end.row == -1)
                     {
                         _mutex.WaitOne();
                     }
@@ -44,7 +45,11 @@ public static class MatrixMultiplier
                              k < _outputMatrixSize.columns &&
                              (j < _threadsActions[i].end.row || k <= _threadsActions[i].end.column); ++k)
                         {
-                            
+                            _outputMatrix[j][k] = 0;
+                            for (int l = 0; l < _matrix1Size.columns; ++l)
+                            {
+                                _outputMatrix[j][k] += _matrix1[j][l] * _matrix2[l][k];
+                            }
                         }
                     }
 
@@ -74,7 +79,7 @@ public static class MatrixMultiplier
     /// <param name="matrix1Path">path to the first matrix</param>
     /// <param name="matrix2Path">path to the second matrix</param>
     /// <param name="outputPath">path to the output file</param>
-    public static void MultiplyMatrixParallel(string matrix1Path, string matrix2Path, string outputPath)
+    public static void Multiply(string matrix1Path, string matrix2Path, string outputPath)
     {
         try
         {
@@ -96,8 +101,24 @@ public static class MatrixMultiplier
             _outputMatrix.Add(new List<int>());
             for (int j = 0; j < _outputMatrixSize.columns; ++j)
             {
-                
+                _outputMatrix[i].Add(0);
             }
         }
+
+        int leftToDistribute = _outputMatrixSize.columns * _outputMatrixSize.rows;
+        int step = (leftToDistribute + ThreadsCount - 1) / ThreadsCount;
+        int currentThread = 0;
+        (int y, int x) currentCoordinates = (0, 0);
+        
+        while (leftToDistribute > 0)
+        {
+            int currentStep = Math.Min(step, leftToDistribute);
+            leftToDistribute -= currentStep;
+            
+        }
+        
+        _mutex.ReleaseMutex();
+        
+        //var x = _outputMatrix.Select(n => n.Select(m => m.ToString()).ToArray())
     }
 }
