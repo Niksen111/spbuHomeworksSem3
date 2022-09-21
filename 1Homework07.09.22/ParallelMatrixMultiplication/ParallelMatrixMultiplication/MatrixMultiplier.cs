@@ -16,6 +16,7 @@ public static class MatrixMultiplier
     private static (int rows, int columns) _matrix1Size;
     private static (int rows, int columns) _matrix2Size;
     private static (int rows, int columns) _outputMatrixSize;
+    private static int _working;
 
     
     static MatrixMultiplier()
@@ -30,13 +31,15 @@ public static class MatrixMultiplier
         {
             var i = index;
             _threadsActions.Add(((-1, -1), (-1, -1)));
+            
             _threads[i] = new Thread(() =>
             {
                 while (true)
                 {
-                    while (_threadsActions[i].end.row == -1)
+                    if (_threadsActions[i].end.row == -1)
                     {
-                        _mutex.WaitOne();
+                        --_working;
+                        _threads[i].Join();
                     }
 
                     for (int j = _threadsActions[i].start.row; j <= _threadsActions[i].end.row; ++j)
@@ -57,6 +60,8 @@ public static class MatrixMultiplier
                 }
             });
         }
+        
+        
     }
 
     private static List<List<int>> GetMatrixFromFile(string path)
@@ -72,7 +77,7 @@ public static class MatrixMultiplier
 
         return matrix;
     }
-    
+
     /// <summary>
     /// Parallel multiplies matrices and writes the answer to the file.
     /// </summary>
@@ -81,16 +86,9 @@ public static class MatrixMultiplier
     /// <param name="outputPath">path to the output file</param>
     public static void Multiply(string matrix1Path, string matrix2Path, string outputPath)
     {
-        try
-        {
-            _matrix1 = GetMatrixFromFile(matrix1Path);
-            _matrix2 = GetMatrixFromFile(matrix2Path);
-        }
-        catch (IOException e)
-        {
-            throw (FailedReadMatricesException) e;
-        }
 
+        _matrix1 = GetMatrixFromFile(matrix1Path);
+        _matrix2 = GetMatrixFromFile(matrix2Path);
         _matrix1Size = (_matrix1.Count, _matrix1[0].Count);
         _matrix2Size = (_matrix2.Count, _matrix2[0].Count);
         _outputMatrixSize = (_matrix1Size.rows, _matrix2Size.columns);
@@ -105,20 +103,37 @@ public static class MatrixMultiplier
             }
         }
 
-        int leftToDistribute = _outputMatrixSize.columns * _outputMatrixSize.rows;
-        int step = (leftToDistribute + ThreadsCount - 1) / ThreadsCount;
+        int size = _outputMatrixSize.columns * _outputMatrixSize.rows;
+        int distributedNow = -1;
+        int step = (size + ThreadsCount - 1) / ThreadsCount;
         int currentThread = 0;
-        (int y, int x) currentCoordinates = (0, 0);
         
-        while (leftToDistribute > 0)
+        while (distributedNow + 1 < size)
         {
-            int currentStep = Math.Min(step, leftToDistribute);
-            leftToDistribute -= currentStep;
-            
+            int currentStep = Math.Min(step, size - distributedNow);
+            _threadsActions[currentThread] = (((distributedNow + 1) / _outputMatrixSize.columns, (distributedNow + 1) % _outputMatrixSize.columns), 
+                ((distributedNow + currentStep) / _outputMatrixSize.columns, ((distributedNow + currentStep) % _outputMatrixSize.columns)));
+            distributedNow += currentStep;
+        }
+
+        for (int i = 0; i < ThreadsCount; ++i)
+        {
+            _threads[i].Start();
+            ++_working;
+        }
+
+        while (_working > 0)
+        {
+            var x = _working;
         }
         
-        _mutex.ReleaseMutex();
+        for (int i = 0; i < ThreadsCount; ++i)
+        {
+            _threads[i].Join();
+        }
+
+        var output = _outputMatrix.Select(n => string.Join(" ", n.Select(m => m.ToString()).ToArray()));
         
-        //var x = _outputMatrix.Select(n => n.Select(m => m.ToString()).ToArray())
+        File.WriteAllLines(outputPath, output);
     }
 }
