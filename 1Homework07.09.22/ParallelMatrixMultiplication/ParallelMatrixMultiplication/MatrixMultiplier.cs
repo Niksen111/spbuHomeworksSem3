@@ -7,7 +7,7 @@
 public static class MatrixMultiplier
 {
     private const int ThreadsCount = 30;
-    private static Thread[] _threads = new Thread[ThreadsCount];
+    private static Thread[] _threads;
     private static List<List<int>> _outputMatrix;
     private static List<List<int>> _matrix1;
     private static List<List<int>> _matrix2;
@@ -18,6 +18,7 @@ public static class MatrixMultiplier
 
     static MatrixMultiplier()
     {
+        _threads = new Thread[ThreadsCount];
         _outputMatrix = new List<List<int>>();
         _matrix1 = new List<List<int>>();
         _matrix2 = new List<List<int>>();
@@ -31,7 +32,10 @@ public static class MatrixMultiplier
         for (int index = 0; index < ThreadsCount; ++index)
         {
             var i = index;
-            _threadsActions.Add(((-1, -1), (-1, -1)));
+            if (_threadsActions.Count < index + 1)
+            {
+                _threadsActions.Add(((-1, -1), (-1, -1)));
+            }
 
             _threads[i] = new Thread(() =>
             {
@@ -43,8 +47,8 @@ public static class MatrixMultiplier
                 for (int j = _threadsActions[i].start.row; j <= _threadsActions[i].end.row; ++j)
                 {
                     for (int k = _threadsActions[i].start.column;
-                         k < _outputMatrixSize.columns &&
-                         (j < _threadsActions[i].end.row || k <= _threadsActions[i].end.column);
+                         k < _outputMatrixSize.columns && j < _threadsActions[i].end.row 
+                         || k <= _threadsActions[i].end.column && j == _threadsActions[i].end.row;
                          ++k)
                     {
                         _outputMatrix[j][k] = 0;
@@ -82,6 +86,7 @@ public static class MatrixMultiplier
     /// <param name="outputPath">path to the output file</param>
     public static void MultiplyParallel(string matrix1Path, string matrix2Path, string outputPath)
     {
+        RefreshThreads();
 
         _matrix1 = GetMatrixFromFile(matrix1Path);
         _matrix2 = GetMatrixFromFile(matrix2Path);
@@ -107,12 +112,12 @@ public static class MatrixMultiplier
         while (distributedNow + 1 < size)
         {
             int currentStep = Math.Min(step, size - distributedNow);
+
             _threadsActions[currentThread] = (((distributedNow + 1) / _outputMatrixSize.columns, (distributedNow + 1) % _outputMatrixSize.columns), 
-                ((distributedNow + currentStep) / _outputMatrixSize.columns, ((distributedNow + currentStep) % _outputMatrixSize.columns)));
+                ((distributedNow + currentStep) / _outputMatrixSize.columns, (distributedNow + currentStep) % _outputMatrixSize.columns));
             distributedNow += currentStep;
+            ++currentThread;
         }
-        
-        RefreshThreads();
 
         for (int i = 0; i < ThreadsCount; ++i)
         {
