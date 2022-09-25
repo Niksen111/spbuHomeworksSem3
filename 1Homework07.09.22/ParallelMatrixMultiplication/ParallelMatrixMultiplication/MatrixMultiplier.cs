@@ -46,7 +46,7 @@ public static class MatrixMultiplier
 
                 for (int j = _threadsActions[i].start.row; j <= _threadsActions[i].end.row; ++j)
                 {
-                    for (int k = _threadsActions[i].start.column;
+                    for (int k = j == _threadsActions[i].start.row ? _threadsActions[i].start.column : 0;
                          k < _outputMatrixSize.columns && j < _threadsActions[i].end.row 
                          || k <= _threadsActions[i].end.column && j == _threadsActions[i].end.row;
                          ++k)
@@ -142,12 +142,16 @@ public static class MatrixMultiplier
         while (distributedNow + 1 < size)
         {
             int currentStep = Math.Min(step, size - distributedNow);
-
+            
             _threadsActions[currentThread] = (((distributedNow + 1) / _outputMatrixSize.columns, (distributedNow + 1) % _outputMatrixSize.columns), 
-                ((distributedNow + currentStep) / _outputMatrixSize.columns, (distributedNow + currentStep) % _outputMatrixSize.columns));
+                ((distributedNow + currentStep) / _outputMatrixSize.columns, (distributedNow + currentStep) % _outputMatrixSize.columns)); 
+            
             distributedNow += currentStep;
             ++currentThread;
         }
+
+        --currentThread;
+        _threadsActions[currentThread] = ((_threadsActions[currentThread].start), (_threadsActions[currentThread].end.row - 1, _outputMatrixSize.columns - 1));
 
         for (int i = 0; i < ThreadsCount; ++i)
         {

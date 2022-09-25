@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelMatrixMultiplicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixMultiplier.Tests", "MatrixMultiplier.Tests\MatrixMultiplier.Tests.csproj", "{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixMultiplicationGetStatistics", "MatrixMultiplicationGetStatistics\MatrixMultiplicationGetStatistics.csproj", "{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
