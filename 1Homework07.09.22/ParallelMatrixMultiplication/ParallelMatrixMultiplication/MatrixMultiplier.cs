@@ -78,6 +78,33 @@ public static class MatrixMultiplier
         return matrix;
     }
 
+    private static void CheckMatrices(List<List<int>> matrix1, List<List<int>> matrix2)
+    {
+        (int rows, int columns) matrix1Size = (matrix1.Count, _matrix1[0].Count);
+        (int rows, int columns) matrix2Size = (matrix2.Count, _matrix2[0].Count);
+
+        if (matrix1Size.columns != matrix2Size.rows)
+        {
+            throw new NonRepeatableMatricesException();
+        }
+
+        for (int i = 0; i < matrix1Size.rows; ++i)
+        {
+            if (matrix1[i].Count != matrix1Size.columns)
+            {
+                throw new NonRepeatableMatricesException();
+            }
+        }
+        
+        for (int i = 0; i < matrix2Size.rows; ++i)
+        {
+            if (matrix2[i].Count != matrix2Size.columns)
+            {
+                throw new NonRepeatableMatricesException();
+            }
+        }
+    }
+
     /// <summary>
     /// Parallel multiplies matrices and writes the answer to the file.
     /// </summary>
@@ -90,6 +117,9 @@ public static class MatrixMultiplier
 
         _matrix1 = GetMatrixFromFile(matrix1Path);
         _matrix2 = GetMatrixFromFile(matrix2Path);
+        
+        CheckMatrices(_matrix1, _matrix2);
+        
         _matrix1Size = (_matrix1.Count, _matrix1[0].Count);
         _matrix2Size = (_matrix2.Count, _matrix2[0].Count);
         _outputMatrixSize = (_matrix1Size.rows, _matrix2Size.columns);
@@ -144,6 +174,9 @@ public static class MatrixMultiplier
     {
         _matrix1 = GetMatrixFromFile(matrix1Path);
         _matrix2 = GetMatrixFromFile(matrix2Path);
+        
+        CheckMatrices(_matrix1, _matrix2);
+        
         _matrix1Size = (_matrix1.Count, _matrix1[0].Count);
         _matrix2Size = (_matrix2.Count, _matrix2[0].Count);
         _outputMatrixSize = (_matrix1Size.rows, _matrix2Size.columns);
