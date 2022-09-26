@@ -5,7 +5,7 @@ namespace MatrixMultiplier.Tests;
 public class Tests
 {
 
-    public bool AreMatricesIdentical(string path1, string path2)
+    private bool AreMatricesIdentical(string path1, string path2)
     {
         StreamReader file1 = new(path1);
         StreamReader file2 = new(path2);
@@ -20,22 +20,39 @@ public class Tests
             
             if (line1 == null && line2 == null)
             {
+                file1.Close();
+                file2.Close();
                 return true;
             }
 
             if (line1 == null && line2 != null || line1 != null && line2 == null)
             {
+                file1.Close();
+                file2.Close();
                 return false;
             }
 
             if (String.Compare(line1, line2) != 0)
             {
+                file1.Close();
+                file2.Close();
                 return false;
             }
         }
     }
 
-    
+    [Test]
+    public void WrongPath()
+    {
+        Assert.Throws<FileNotFoundException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded(
+            "../../../TestFiles/Lol.txt",
+            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt"));
+        Assert.Throws<FileNotFoundException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel(
+            "../../../TestFiles/Lol.txt",
+            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt"));
+    }
+
+    [Test]
     public void NonRepeatableMatrices()
     {
         var matrix1 = new[] {"1 1 1", "1 1 1"};

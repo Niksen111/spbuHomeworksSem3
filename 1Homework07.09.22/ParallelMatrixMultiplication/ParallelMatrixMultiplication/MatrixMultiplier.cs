@@ -6,7 +6,7 @@
 /// </summary>
 public static class MatrixMultiplier
 {
-    private const int ThreadsCount = 30;
+    public static int ThreadsCount => 15;
     private static Thread[] _threads;
     private static List<List<int>> _outputMatrix;
     private static List<List<int>> _matrix1;
