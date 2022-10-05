@@ -1,15 +1,34 @@
 namespace Lazy;
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class LazyParallel<T> : ILazy<T>
 {
     private Func<T>? _supplier;
     private bool _isCalculated;
-    private T? _value;
+    private Value? _value;
 
     public LazyParallel(Func<T> func)
     {
         _supplier = func;
         _isCalculated = false;
+    }
+
+    private class Value 
+    {
+        private readonly T? _value;
+        
+        public Value(T value)
+        {
+            _value = value;
+        }
+
+        public T? Get()
+        {
+            return _value;
+        }
     }
 
     public T? Get()
@@ -18,12 +37,16 @@ public class LazyParallel<T> : ILazy<T>
         {
             lock (_supplier!)
             {
-                _value = _supplier!();
+                if (!_isCalculated)
+                {
+                    Value value = new Value(_supplier());
+                    Volatile.Write( ref _value, value);
+                    _isCalculated = true;
+                    _supplier = null;
+                }
             }
-            _isCalculated = true;
-            _supplier = null;
         }
-
-        return _value;
+        
+        return Volatile.Read(ref _value)!.Get();
     }
 }

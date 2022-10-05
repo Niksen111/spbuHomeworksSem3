@@ -1,5 +1,9 @@
 ﻿namespace Lazy;
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class LazyOneThread<T> : ILazy<T>
 {
     private Func<T>? _supplier;
