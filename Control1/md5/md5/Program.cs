@@ -14,12 +14,12 @@ public class Program
         stopwatch.Start();
         var x1 = CheckSum.GetCheckSum("../../../../../../");
         stopwatch.Stop();
-        time1 = stopwatch.ElapsedMilliseconds;
+        time1 = stopwatch.ElapsedTicks;
         stopwatch.Reset();
         stopwatch.Start();
         var x2 = CheckSum.GetCheckSumParallel("../../../../../../").Result;
         stopwatch.Stop();
-        time2 = stopwatch.ElapsedMilliseconds;
+        time2 = stopwatch.ElapsedTicks;
 
         Console.WriteLine($"One-thread {time1}, parallel {time2}");
     }
