@@ -21,8 +21,16 @@ public class Server
                     var stream = new NetworkStream(socket);
                     var reader = new StreamReader(stream);
                     var data = await reader.ReadLineAsync();
-                    
-                    
+                    if (data == null)
+                    {
+                        return;
+                    }
+
+                    var request = data.Split();
+                    if (request.Length != 2)
+                    {
+                        
+                    }
                 }
             });
         }
