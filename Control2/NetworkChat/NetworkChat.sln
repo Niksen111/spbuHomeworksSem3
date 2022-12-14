@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkChat", "NetworkChat\NetworkChat.csproj", "{C17418EE-5DD9-4736-9963-9D20F754D06F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C17418EE-5DD9-4736-9963-9D20F754D06F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C17418EE-5DD9-4736-9963-9D20F754D06F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C17418EE-5DD9-4736-9963-9D20F754D06F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C17418EE-5DD9-4736-9963-9D20F754D06F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
