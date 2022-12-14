@@ -42,7 +42,8 @@ public class Client
                     }
                 }
             });
-
+            listen.Start();
+            write.Start();
             await Task.WhenAny(listen, write);
         }
     }

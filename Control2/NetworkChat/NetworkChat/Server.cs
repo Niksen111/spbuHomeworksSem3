@@ -46,6 +46,9 @@ public class Server
                     }
                 }
             });
+            
+            listen.Start();
+            write.Start();
             await Task.WhenAny(listen, write);
         }
         listener.Stop();
