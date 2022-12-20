@@ -1,8 +1,13 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace SimpleFtp;
+namespace Server;
 
+/// <summary>
+/// A server handling two requests:
+/// List - listing files in the directory on the server
+/// Get - downloading a file from the server
+/// </summary>
 public class Server
 {
     public async Task Start(int port = 11111)

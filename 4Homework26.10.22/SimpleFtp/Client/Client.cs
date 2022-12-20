@@ -1,9 +1,19 @@
 ﻿using System.Net.Sockets;
 
-namespace SimpleFtp;
+namespace Client;
 
+/// <summary>
+/// Client allowing to execute requests:
+/// List - listing files in the directory on the server
+/// Get - downloading a file from the server
+/// </summary>
 public class Client
 {
+    /// <summary>
+    /// Starts client
+    /// </summary>
+    /// <param name="port">The port number of the remote host to which you intend to connect.</param>
+    /// <param name="host">The DNS name of the remote host to which you intend to connect.</param>
     public async Task Start(int port = 11111, string host = "localhost")
     {
         using (var client = new TcpClient(host, port))
@@ -32,15 +42,15 @@ public class Client
                     return;
                 }
                 
-                writer.WriteLine(line);
+                await writer.WriteLineAsync(line);
                 writer.Flush();
                 
-                var data = reader.ReadToEnd();
+                var data = await reader.ReadToEndAsync();
                 Console.WriteLine($"Received: \n{data}");
             }
         }
     }
-
+    
     private static void PrintHelp()
     {
         Console.WriteLine("Usage: [command] PATH");
