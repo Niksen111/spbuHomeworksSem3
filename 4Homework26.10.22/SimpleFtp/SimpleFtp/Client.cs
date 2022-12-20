@@ -1,17 +1,17 @@
 ﻿using System.Net.Sockets;
 
-namespace Client;
+namespace SimpleFtp;
 
 public class Client
 {
-    public static void Main(string[] args)
+    public async Task Start(int port = 11111, string host = "localhost")
     {
-        const int port = 11111;
-        const string host = "localhost";
         using (var client = new TcpClient(host, port))
         {
             var stream = client.GetStream();
             Console.WriteLine("Print  help  to get help");
+            var writer = new StreamWriter(stream);
+            var reader = new StreamReader(stream);
             while (true)
             {
                 var line = Console.ReadLine();
@@ -32,11 +32,9 @@ public class Client
                     return;
                 }
                 
-                var writer = new StreamWriter(stream);
                 writer.WriteLine(line);
                 writer.Flush();
                 
-                var reader = new StreamReader(stream);
                 var data = reader.ReadToEnd();
                 Console.WriteLine($"Received: \n{data}");
             }
