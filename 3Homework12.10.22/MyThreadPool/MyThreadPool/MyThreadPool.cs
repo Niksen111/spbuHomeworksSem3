@@ -3,7 +3,7 @@
 using System.Collections.Concurrent;
 
 /// <summary>
-/// Implements the ThreadPool abstraction.
+/// The ThreadPool abstraction.
 /// </summary>
 public class MyThreadPool
 {
@@ -11,7 +11,6 @@ public class MyThreadPool
     private MyThread[] threads;
     private CancellationTokenSource source = new();
     private bool isShutdown = false;
-    private ManualResetEvent reset = new(false);
 
     /// <summary>
     /// Gets number of existing threads.
@@ -74,10 +73,8 @@ public class MyThreadPool
             thread.Join();
             if (thread.IsWorking)
             {
-                this.reset.WaitOne();
+                throw new TimeoutException();
             }
-
-            thread.Join();
         }
     }
 
@@ -85,6 +82,7 @@ public class MyThreadPool
     {
         private Thread thread;
         private BlockingCollection<Action> collection;
+        private int timeout = 10000;
 
         public bool IsWorking { get; private set; }
 
@@ -95,7 +93,13 @@ public class MyThreadPool
             this.IsWorking = false;
         }
 
-        public void Join() => this.thread.Join();
+        public void Join()
+        {
+            if (this.thread.IsAlive)
+            {
+                this.thread.Join(this.timeout);
+            }
+        }
 
         private void Start(CancellationToken token)
         {
@@ -105,6 +109,7 @@ public class MyThreadPool
                 {
                     this.IsWorking = true;
                     action();
+                    this.IsWorking = false;
                 }
             }
         }
