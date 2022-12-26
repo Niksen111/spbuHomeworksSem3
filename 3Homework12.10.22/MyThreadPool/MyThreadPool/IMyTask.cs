@@ -1,8 +1,14 @@
 namespace MyThreadPool;
 
+/// <summary>
+/// An operation performed on MyThreadPool that returns a value
+/// </summary>
+/// <typeparam name="TResult"></typeparam>
 public interface IMyTask<TResult>
 {
-    public bool IsCompleted { get; }
-    public TResult Result { get; }
+    bool IsCompleted { get; }
     
+    TResult Result { get; }
+
+    IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> func);
 }
