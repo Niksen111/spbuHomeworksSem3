@@ -1,6 +1,6 @@
-using NUnit.Framework;
-
 namespace MyThreadPool.Tests;
+
+using NUnit.Framework;
 
 public class Tests
 {

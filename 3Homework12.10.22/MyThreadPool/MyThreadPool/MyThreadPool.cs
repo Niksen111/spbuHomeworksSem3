@@ -1,64 +1,112 @@
-﻿using System.Collections.Concurrent;
+﻿namespace MyThreadPool;
 
-namespace MyThreadPool;
+using System.Collections.Concurrent;
 
 /// <summary>
-/// Pool of tasks
+/// Implements the ThreadPool abstraction.
 /// </summary>
 public class MyThreadPool
 {
-    private BlockingCollection<Action> _tasks;
-    private MyThread[] _myThreads;
-    private CancellationTokenSource _source = new ();
-    private bool _isShutdown = false;
+    private BlockingCollection<Action> tasks;
+    private MyThread[] threads;
+    private CancellationTokenSource source = new();
+    private bool isShutdown = false;
+    private ManualResetEvent reset = new(false);
 
-    public int ThreadCount  { get; }
+    /// <summary>
+    /// Gets number of existing threads.
+    /// </summary>
+    public int ThreadCount { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MyThreadPool"/> class.
+    /// </summary>
+    /// <param name="threadCount">Number of this ThreadPool threads.</param>
     public MyThreadPool(int threadCount = 10)
     {
         if (threadCount <= 0)
         {
-            throw new BadThreadsNumberException();
+            throw new InvalidDataException();
         }
-        
-        ThreadCount = threadCount;
-        _tasks = new ();
-        _myThreads = new MyThread[threadCount];
-        
+
+        this.ThreadCount = threadCount;
+        this.tasks = new();
+        this.threads = new MyThread[threadCount];
+
         for (int i = 0; i < threadCount; ++i)
         {
-            _myThreads[i] = new MyThread(_tasks, _source.Token);
+            this.threads[i] = new MyThread(this.tasks, this.source.Token);
         }
     }
 
+    /// <summary>
+    /// Submits new task to the ThreadPool.
+    /// </summary>
+    /// <param name="func">A calculation to perform.</param>
+    /// <typeparam name="TResult">Value type.</typeparam>
+    /// <returns>Task.</returns>
     public IMyTask<TResult> Submit<TResult>(Func<TResult> func)
     {
-        var task = new MyTask<TResult>(func);
-        return null;
+        var task = new MyTask<TResult>(func, this);
+        this.tasks.Add(() => task.Start());
+        return task;
     }
 
+    /// <summary>
+    /// Completes the threads.
+    /// </summary>
     public void Shutdown()
     {
-        if (_isShutdown)
+        if (this.isShutdown)
         {
             return;
         }
-        _tasks.CompleteAdding();
-        _source.Cancel();
+
+        this.tasks.CompleteAdding();
+
+        while (this.tasks.Count > 0)
+        {
+        }
+
+        this.source.Cancel();
+        foreach (var thread in this.threads)
+        {
+            thread.Join();
+            if (thread.IsWorking)
+            {
+                this.reset.WaitOne();
+            }
+
+            thread.Join();
+        }
     }
 
     private class MyThread
     {
-        private Thread _thread;
-        private BlockingCollection<Action> _collection;
+        private Thread thread;
+        private BlockingCollection<Action> collection;
+
+        public bool IsWorking { get; private set; }
 
         public MyThread(BlockingCollection<Action> collection, CancellationToken token)
         {
-            _collection = collection;
+            this.collection = collection;
+            this.thread = new Thread(() => this.Start(token));
+            this.IsWorking = false;
         }
 
-        public bool IsWaiting { get; private set; }
+        public void Join() => this.thread.Join();
 
-        public void Join() => _thread.Join();
+        private void Start(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                if (this.collection.TryTake(out var action))
+                {
+                    this.IsWorking = true;
+                    action();
+                }
+            }
+        }
     }
 }

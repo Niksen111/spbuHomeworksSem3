@@ -2,12 +2,16 @@ namespace MyThreadPool;
 
 public class MyTask<T> : IMyTask<T>
 {
-    private bool _isComplited = false;
-    public bool IsCompleted => _isComplited;
+    public bool IsCompleted { get; } = false;
 
     public T Result { get; }
 
-    public MyTask(Func<T> func)
+    public MyTask(Func<T> func, MyThreadPool threadPool)
+    {
+        
+    }
+
+    public void Start()
     {
         
     }
