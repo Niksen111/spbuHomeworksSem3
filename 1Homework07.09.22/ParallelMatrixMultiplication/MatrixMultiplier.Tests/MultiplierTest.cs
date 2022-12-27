@@ -4,19 +4,15 @@ namespace MatrixMultiplier.Tests;
 
 public class Tests
 {
-
     private bool AreMatricesIdentical(string path1, string path2)
     {
         StreamReader file1 = new(path1);
         StreamReader file2 = new(path2);
-        
-        string? line1;
-        string? line2;
 
         while (true)
         {
-            line1 = file1.ReadLine();
-            line2 = file2.ReadLine();
+            var line1 = file1.ReadLine();
+            var line2 = file2.ReadLine();
             
             if (line1 == null && line2 == null)
             {
@@ -25,7 +21,7 @@ public class Tests
                 return true;
             }
 
-            if (line1 == null && line2 != null || line1 != null && line2 == null)
+            if (line1 == null ^ line2 == null)
             {
                 file1.Close();
                 file2.Close();
@@ -55,20 +51,22 @@ public class Tests
     [Test]
     public void NonRepeatableMatrices()
     {
-        var matrix1 = new[] {"1 1 1", "1 1 1"};
+        var matrix1 = new[] {
+            "1 1 1", 
+            "1 1 1"};
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix1);
-        Assert.Throws<NonRepeatableMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt", 
+        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt", 
             "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonRepeatableMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt", 
+        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt", 
             "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt"));
         
         var matrix2 = new[] {"1 1 1", "1 1 1", "1 1"};
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix2);
-        Assert.Throws<NonRepeatableMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt", 
+        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt", 
             "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonRepeatableMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt", 
+        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt", 
             "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt"));
     }
 

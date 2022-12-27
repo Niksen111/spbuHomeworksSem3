@@ -6,7 +6,7 @@
 /// </summary>
 public static class MatrixMultiplier
 {
-    public static int ThreadsCount => 15;
+    public static int ThreadsCount => Environment.ProcessorCount;
     private static Thread[] _threads;
     private static List<List<int>> _outputMatrix;
     private static List<List<int>> _matrix1;
@@ -85,14 +85,14 @@ public static class MatrixMultiplier
 
         if (matrix1Size.columns != matrix2Size.rows)
         {
-            throw new NonRepeatableMatricesException();
+            throw new NonMultipleMatricesException();
         }
 
         for (int i = 0; i < matrix1Size.rows; ++i)
         {
             if (matrix1[i].Count != matrix1Size.columns)
             {
-                throw new NonRepeatableMatricesException();
+                throw new NonMultipleMatricesException();
             }
         }
         
@@ -100,7 +100,7 @@ public static class MatrixMultiplier
         {
             if (matrix2[i].Count != matrix2Size.columns)
             {
-                throw new NonRepeatableMatricesException();
+                throw new NonMultipleMatricesException();
             }
         }
     }
