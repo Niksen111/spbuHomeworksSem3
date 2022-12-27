@@ -1,16 +1,22 @@
 namespace MyThreadPool;
 
+/// <inheritdoc />
 public class MyTask<T> : IMyTask<T>
 {
     private MyThreadPool pool;
     private Func<T> func;
     private ManualResetEvent reset = new(false);
     private T result;
-    private Exception? retrunedException;
+    private Exception? returnedException;
 
     /// <inheritdoc/>
     public bool IsCompleted { get; private set; } = false;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MyTask{T}"/> class.
+    /// </summary>
+    /// <param name="func">Function that will performed.</param>
+    /// <param name="threadPool"></param>
     public MyTask(Func<T> func, MyThreadPool threadPool)
     {
         this.func = func;
@@ -23,9 +29,9 @@ public class MyTask<T> : IMyTask<T>
         get
         {
             this.reset.WaitOne();
-            if (this.retrunedException != null)
+            if (this.returnedException != null)
             {
-                throw new AggregateException(this.retrunedException);
+                throw new AggregateException(this.returnedException);
             }
 
             return this.result;
@@ -40,7 +46,7 @@ public class MyTask<T> : IMyTask<T>
         }
         catch (Exception exception)
         {
-            this.retrunedException = exception;
+            this.returnedException = exception;
         }
         finally
         {
