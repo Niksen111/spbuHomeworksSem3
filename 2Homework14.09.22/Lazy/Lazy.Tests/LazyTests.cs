@@ -7,10 +7,7 @@ using NUnit.Framework;
 
 public class Tests
 {
-    private Func<object> hugeFunction = () =>
-    {
-        return 0;
-    };
+    private Func<object> hugeFunction = () => 0;
 
     [SetUp]
     public void SetUp()
@@ -30,7 +27,7 @@ public class Tests
     [Test]
     public void OneThreadIsWorking()
     {
-        LazyOneThread<object> lazy = new LazyOneThread<object>(this.hugeFunction);
+        LazyOneThread<object> lazy = new(this.hugeFunction);
         var object1 = lazy.Get();
         var object2 = lazy.Get();
         var object3 = lazy.Get();
