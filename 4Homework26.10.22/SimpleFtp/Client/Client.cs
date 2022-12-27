@@ -1,55 +1,57 @@
-﻿using System.Net.Sockets;
+﻿namespace Client;
 
-namespace Client;
+using System.Net.Sockets;
 
 /// <summary>
 /// Client allowing to execute requests:
 /// List - listing files in the directory on the server
-/// Get - downloading a file from the server
+/// Get - downloading a file from the server.
 /// </summary>
 public class Client
 {
     /// <summary>
-    /// Starts client
+    /// Sends a request for a listing of the directory to the server.
     /// </summary>
-    /// <param name="port">The port number of the remote host to which you intend to connect.</param>
-    /// <param name="host">The DNS name of the remote host to which you intend to connect.</param>
-    public async Task Start(int port = 11111, string host = "localhost")
+    /// <param name="stream">The stream to read and write to.</param>
+    /// <param name="path">Path to the directory.</param>
+    public async Task<string?> ListAsync(NetworkStream stream, string path)
     {
-        using var client = new TcpClient(host, port);
-        var stream = client.GetStream();
-        Console.WriteLine("Print  help  to get help");
-        var writer = new StreamWriter(stream);
-        var reader = new StreamReader(stream);
-        while (true)
+        await using var writer = new StreamWriter(stream);
+
+        await writer.WriteLineAsync($"1 {path}");
+        await writer.FlushAsync();
+
+        using var reader = new StreamReader(stream);
+        var result = await reader.ReadToEndAsync();
+        if (result == "-1")
         {
-            var line = Console.ReadLine();
-            if (line == null)
-            {
-                PrintFailed();
-                continue;
-            }
-
-            if (String.Compare(line, "help") == 0)
-            {
-                continue;
-            }
-
-            if (String.Compare(line, "q") == 0)
-            {
-                return;
-            }
-
-            await writer.WriteLineAsync(line);
-            writer.Flush();
-
-            var data = await reader.ReadToEndAsync();
-            Console.WriteLine($"Received: \n{data}");
+            throw new DirectoryNotFoundException();
         }
+
+        return result;
     }
 
-    private static void PrintFailed()
+    /// <summary>
+    /// Sends a request for a file to the server.
+    /// </summary>
+    /// <param name="stream">The stream to read and write to.</param>
+    /// <param name="path">Path to file.</param>
+    public async Task GetAsync(NetworkStream stream, string path, string newPath)
     {
-        Console.WriteLine("Failed to read request");
+        await using var writer = new StreamWriter(stream);
+
+        await writer.WriteLineAsync($"2 {path}");
+        await writer.FlushAsync();
+
+        var byteLength = new byte[8];
+        var readAsync = await stream.ReadAsync(byteLength);
+        var length = BitConverter.ToInt64(byteLength);
+        if (length == -1)
+        {
+            throw new FileNotFoundException();
+        }
+
+        using var file = File.Open(newPath, FileMode.Open);
+        await stream.CopyToAsync(file);
     }
 }

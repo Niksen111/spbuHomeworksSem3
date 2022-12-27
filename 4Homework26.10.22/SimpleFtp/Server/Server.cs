@@ -63,7 +63,7 @@ public class Server
                 if (request.Length != 2)
                 {
                     await writer.WriteLineAsync("Incorrect request");
-                    writer.Flush();
+                    await writer.FlushAsync();
                     continue;
                 }
 
@@ -84,7 +84,7 @@ public class Server
                     default:
                     {
                         await writer.WriteLineAsync("Incorrect request");
-                        writer.Flush();
+                        await writer.FlushAsync();
                         continue;
                     }
                 }
@@ -101,7 +101,7 @@ public class Server
         if (!Directory.Exists(path))
         {
             await writer.WriteLineAsync("-1");
-            writer.Flush();
+            await writer.FlushAsync();
             return;
         }
 
@@ -122,7 +122,7 @@ public class Server
 
         await writer.WriteLineAsync();
 
-        writer.Flush();
+        await writer.FlushAsync();
     }
 
     private async Task GetAsync(string path, StreamWriter writer, NetworkStream stream)
@@ -130,7 +130,7 @@ public class Server
         if (!File.Exists(path))
         {
             await writer.WriteLineAsync("-1");
-            writer.Flush();
+            await writer.FlushAsync();
             return;
         }
 
