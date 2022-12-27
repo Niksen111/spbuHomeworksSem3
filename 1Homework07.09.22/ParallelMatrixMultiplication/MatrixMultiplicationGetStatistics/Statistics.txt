@@ -1,0 +1,208 @@
+CONFIGURATION 1
+
+Sizes of matrices - 200 x 200
+Number of iterations - 50
+Number of threads in parallel multiplication - 15
+
+One-thread multiplication:
+    Expected value - 168835573
+    Standard deviation - 15747315.84681618
+
+Parallel multiplication:
+    Expected value - 60801594
+    Standard deviation - 12175005.562660865
+
+Ratio of expected values - 2.776828
+
+CONFIGURATION 2
+
+Sizes of matrices - 200 x 200
+Number of iterations - 50
+Number of threads in parallel multiplication - 20
+
+One-thread multiplication:
+    Expected value - 194759507
+    Standard deviation - 28967768.43051948
+
+Parallel multiplication:
+    Expected value - 66591155
+    Standard deviation - 7212512.971358388
+
+Ratio of expected values - 2.9247053
+
+CONFIGURATION 3
+
+Sizes of matrices - 200 x 200
+Number of iterations - 50
+Number of threads in parallel multiplication - 25
+
+One-thread multiplication:
+    Expected value - 191089402
+    Standard deviation - 28765309.156918757
+
+Parallel multiplication:
+    Expected value - 66313654
+    Standard deviation - 5512231.857277413
+
+Ratio of expected values - 2.8815997
+
+CONFIGURATION 4
+
+Sizes of matrices - 150 x 150
+Number of iterations - 50
+Number of threads in parallel multiplication - 25
+
+One-thread multiplication:
+    Expected value - 79784669
+    Standard deviation - 12306081.005541204
+
+Parallel multiplication:
+    Expected value - 31592169
+    Standard deviation - 5286510.59602674
+
+Ratio of expected values - 2.5254574
+
+CONFIGURATION 5
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 25
+
+One-thread multiplication:
+    Expected value - 70833899
+    Standard deviation - 7245502.57445693
+
+Parallel multiplication:
+    Expected value - 29566189
+    Standard deviation - 2520720.6614460475
+
+Ratio of expected values - 2.3957736
+
+CONFIGURATION 6
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 25
+
+One-thread multiplication:
+    Expected value - 70867113
+    Standard deviation - 7156000.994132966
+
+Parallel multiplication:
+    Expected value - 29455682
+    Standard deviation - 1945137.3937886753
+
+Ratio of expected values - 2.4058893
+
+CONFIGURATION 7
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 30
+
+One-thread multiplication:
+    Expected value - 73446926
+    Standard deviation - 9138218.076998327
+
+Parallel multiplication:
+    Expected value - 30092584
+    Standard deviation - 4697840.235966311
+
+Ratio of expected values - 2.4406986
+
+CONFIGURATION 8
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 27
+
+One-thread multiplication:
+    Expected value - 72205525
+    Standard deviation - 9650872.117344992
+
+Parallel multiplication:
+    Expected value - 29998371
+    Standard deviation - 4547964.43336038
+
+Ratio of expected values - 2.4069815
+
+CONFIGURATION 9
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 22
+
+One-thread multiplication:
+    Expected value - 74206407
+    Standard deviation - 10552298.199842203
+
+Parallel multiplication:
+    Expected value - 29729417
+    Standard deviation - 2622879.8753667693
+
+Ratio of expected values - 2.4960601
+
+CONFIGURATION 10
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 17
+
+One-thread multiplication:
+    Expected value - 78773673
+    Standard deviation - 11594096.536831018
+
+Parallel multiplication:
+    Expected value - 31132775
+    Standard deviation - 3847424.2862976524
+
+Ratio of expected values - 2.5302489
+
+CONFIGURATION 11
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 19
+
+One-thread multiplication:
+    Expected value - 73864683
+    Standard deviation - 11594030.414766472
+
+Parallel multiplication:
+    Expected value - 30089034
+    Standard deviation - 3778463.385906763
+
+Ratio of expected values - 2.4548705
+
+CONFIGURATION 12
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 21
+
+One-thread multiplication:
+    Expected value - 83596335
+    Standard deviation - 18203570.806147814
+
+Parallel multiplication:
+    Expected value - 32313464
+    Standard deviation - 6851151.845517657
+
+Ratio of expected values - 2.5870435
+
+CONFIGURATION 13
+
+Sizes of matrices - 150 x 150
+Number of iterations - 100
+Number of threads in parallel multiplication - 15
+
+One-thread multiplication:
+    Expected value - 70518758
+    Standard deviation - 8806374.428460443
+
+Parallel multiplication:
+    Expected value - 29229921
+    Standard deviation - 3847389.0116368528
+
+Ratio of expected values - 2.412554
+
