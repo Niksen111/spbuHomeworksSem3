@@ -1,5 +1,9 @@
-﻿using Server;
+﻿var source = new CancellationTokenSource();
 
-var server = new Server.Server();
+var server = new Server.Server(source.Token);
 
-server.Start().Wait();
+Task.Run(() => server.Start());
+if (Console.ReadKey().Key == ConsoleKey.Enter)
+{
+    source.Cancel();
+}
