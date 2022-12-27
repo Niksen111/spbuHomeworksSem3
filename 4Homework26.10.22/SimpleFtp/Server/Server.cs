@@ -107,16 +107,15 @@ public class Server
         await writer.WriteAsync($"{directories.Count + files.Count} ");
         foreach (var directory in directories)
         {
-            await writer.WriteAsync($"{path}{directory} true ");
+            await writer.WriteAsync($"{directory} true ");
         }
 
         foreach (var file in files)
         {
-            await writer.WriteAsync($"{path}{file} false ");
+            await writer.WriteAsync($"{file} false ");
         }
 
         await writer.WriteLineAsync();
-
         await writer.FlushAsync();
     }
 
@@ -129,9 +128,7 @@ public class Server
             return;
         }
 
-        var info = new FileInfo(path);
-        var file = info.Open(FileMode.Open);
-        await file.CopyToAsync(stream, this.token);
-        file.Close();
+        await using var reader = new FileStream(path, FileMode.Open);
+        await reader.CopyToAsync(stream);
     }
 }

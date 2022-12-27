@@ -28,6 +28,8 @@ internal static class Program
         await client.ConnectAsync(args[0], port);
         await using var stream = client.GetStream();
         var clinet = new Client();
+        await using var writer = new StreamWriter(stream);
+        using var reader = new StreamReader(stream);
 
         Console.WriteLine("Type \"help\" to see a list of commands");
 
@@ -61,7 +63,7 @@ internal static class Program
                         throw new InvalidDataException();
                     }
 
-                    Console.WriteLine(await clinet.ListAsync(stream, request[1]));
+                    Console.WriteLine(await clinet.ListAsync(writer, reader, request[1]));
                     break;
                 }
 
@@ -72,7 +74,7 @@ internal static class Program
                         throw new InvalidDataException();
                     }
 
-                    await clinet.GetAsync(stream, request[1], request[2]);
+                    await clinet.GetAsync(stream, writer, request[1], request[2]);
                     break;
                 }
 
@@ -93,7 +95,7 @@ internal static class Program
         Console.WriteLine(" 1        listing of files in the directory on the server");
         Console.WriteLine(" 2        download file from the server");
         Console.WriteLine();
-        Console.WriteLine("q  -  quite");
+        Console.WriteLine("q  -  quit");
     }
 
     private static void PrintFailed()
