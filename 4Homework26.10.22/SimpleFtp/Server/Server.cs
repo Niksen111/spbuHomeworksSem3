@@ -53,11 +53,6 @@ public class Server
                     break;
                 }
 
-                if (string.CompareOrdinal(line, "q") == 0)
-                {
-                    break;
-                }
-
                 var request = line.Split();
 
                 if (request.Length != 2)

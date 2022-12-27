@@ -14,6 +14,7 @@ public class Client
     /// </summary>
     /// <param name="stream">The stream to read and write to.</param>
     /// <param name="path">Path to the directory.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task<string?> ListAsync(NetworkStream stream, string path)
     {
         await using var writer = new StreamWriter(stream);
@@ -36,6 +37,8 @@ public class Client
     /// </summary>
     /// <param name="stream">The stream to read and write to.</param>
     /// <param name="path">Path to file.</param>
+    /// <param name="newPath">Path at which file should be saved.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task GetAsync(NetworkStream stream, string path, string newPath)
     {
         await using var writer = new StreamWriter(stream);
@@ -44,8 +47,8 @@ public class Client
         await writer.FlushAsync();
 
         var byteLength = new byte[8];
-        var readAsync = await stream.ReadAsync(byteLength);
-        var length = BitConverter.ToInt64(byteLength);
+        await stream.ReadAsync(byteLength);
+        var length = BitConverter.ToInt32(byteLength);
         if (length == -1)
         {
             throw new FileNotFoundException();
