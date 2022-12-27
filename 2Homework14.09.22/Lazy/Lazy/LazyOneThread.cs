@@ -1,30 +1,35 @@
 ﻿namespace Lazy;
 
 /// <summary>
-/// 
+/// One-threaded implementation of the Lazy interface.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Returnable type.</typeparam>
 public class LazyOneThread<T> : ILazy<T>
 {
-    private Func<T>? _supplier;
-    private bool _isCalculated;
-    private T? _value;
+    private Func<T>? supplier;
+    private bool isCalculated;
+    private T? value;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LazyOneThread{T}"/> class.
+    /// </summary>
+    /// <param name="func">Function for calculating.</param>
     public LazyOneThread(Func<T> func)
     {
-        _supplier = func;
-        _isCalculated = false;
+        this.supplier = func;
+        this.isCalculated = false;
     }
 
+    /// <inheritdoc/>
     public T? Get()
     {
-        if (!_isCalculated)
+        if (!this.isCalculated)
         {
-            _value = _supplier!();
-            _isCalculated = true;
-            _supplier = null;
+            this.value = this.supplier!();
+            this.isCalculated = true;
+            this.supplier = null;
         }
 
-        return _value;
+        return this.value;
     }
 }

@@ -1,52 +1,57 @@
 namespace Lazy;
 
 /// <summary>
-/// 
+/// Multi-threaded implementation of the Lazy interface.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Returnable type.</typeparam>
 public class LazyParallel<T> : ILazy<T>
 {
-    private Func<T>? _supplier;
-    private bool _isCalculated;
-    private Value? _value;
+    private Func<T>? supplier;
+    private volatile bool isCalculated;
+    private Value? value;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LazyParallel{T}"/> class.
+    /// </summary>
+    /// <param name="func">Function for calculating.</param>
     public LazyParallel(Func<T> func)
     {
-        _supplier = func;
-        _isCalculated = false;
+        this.supplier = func;
+        this.isCalculated = false;
     }
 
-    private class Value 
+    /// <inheritdoc/>
+    public T? Get()
     {
-        private readonly T? _value;
-        
+        if (!this.isCalculated)
+        {
+            lock (this.supplier!)
+            {
+                if (!this.isCalculated)
+                {
+                    Value value1 = new Value(this.supplier());
+                    Volatile.Write(ref this.value, value1);
+                    this.isCalculated = true;
+                    this.supplier = null;
+                }
+            }
+        }
+
+        return Volatile.Read(ref this.value)!.Get();
+    }
+
+    private class Value
+    {
+        private readonly T? value;
+
         public Value(T value)
         {
-            _value = value;
+            this.value = value;
         }
 
         public T? Get()
         {
-            return _value;
+            return this.value;
         }
-    }
-
-    public T? Get()
-    {
-        if (!_isCalculated)
-        {
-            lock (_supplier!)
-            {
-                if (!_isCalculated)
-                {
-                    Value value = new Value(_supplier());
-                    Volatile.Write( ref _value, value);
-                    _isCalculated = true;
-                    _supplier = null;
-                }
-            }
-        }
-        
-        return Volatile.Read(ref _value)!.Get();
     }
 }
