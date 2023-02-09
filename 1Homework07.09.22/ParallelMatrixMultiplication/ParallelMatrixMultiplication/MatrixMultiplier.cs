@@ -1,6 +1,5 @@
 ﻿namespace ParallelMatrixMultiplication;
 
-
 /// <summary>
 /// Provides a parallel multiplication of matrices.
 /// </summary>

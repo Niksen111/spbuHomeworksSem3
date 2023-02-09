@@ -1,6 +1,6 @@
-using ParallelMatrixMultiplication;
-
 namespace MatrixMultiplier.Tests;
+
+using ParallelMatrixMultiplication;
 
 public class Tests
 {
@@ -13,7 +13,6 @@ public class Tests
         {
             var line1 = file1.ReadLine();
             var line2 = file2.ReadLine();
-            
             if (line1 == null && line2 == null)
             {
                 file1.Close();
