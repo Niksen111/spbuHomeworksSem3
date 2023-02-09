@@ -1,3 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿if (args.Length != 1)
+{
+    Console.WriteLine("Too much arguments.");
+    return;
+}
 
-Console.WriteLine("Hello, World!");
