@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-var matricesSize = 150;
+var matricesSize = 3;
 int iterationsNumber = 100;
 var info = File.ReadAllLines("../../../GlobalInfo.txt");
 int index = int.Parse(info[0]);
@@ -9,7 +9,7 @@ int index = int.Parse(info[0]);
 var line = new List<string>();
 for (int i = 0; i < matricesSize; ++i)
 {
-    line.Add("100");
+    line.Add("1");
 }
 
 var line1 = String.Join(" ", line.ToArray());
