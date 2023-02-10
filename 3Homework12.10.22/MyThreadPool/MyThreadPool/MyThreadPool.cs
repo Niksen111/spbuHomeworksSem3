@@ -13,11 +13,6 @@ public class MyThreadPool
     private bool isShutdown = false;
 
     /// <summary>
-    /// Gets number of existing threads.
-    /// </summary>
-    public int ThreadCount { get; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="MyThreadPool"/> class.
     /// </summary>
     /// <param name="threadCount">Number of this ThreadPool threads.</param>
@@ -37,6 +32,11 @@ public class MyThreadPool
             this.threads[i] = new MyThread(this.tasks, this.source.Token);
         }
     }
+
+    /// <summary>
+    /// Gets number of existing threads.
+    /// </summary>
+    public int ThreadCount { get; }
 
     /// <summary>
     /// Submits new task to the ThreadPool.
@@ -73,7 +73,7 @@ public class MyThreadPool
             thread.Join();
             if (thread.IsWorking)
             {
-                throw new TimeoutException();
+                thread.Interrupt();
             }
         }
     }
@@ -82,16 +82,17 @@ public class MyThreadPool
     {
         private Thread thread;
         private BlockingCollection<Action> collection;
-        private int timeout = 10000;
-
-        public bool IsWorking { get; private set; }
+        private int timeout = 5000;
 
         public MyThread(BlockingCollection<Action> collection, CancellationToken token)
         {
             this.collection = collection;
             this.thread = new Thread(() => this.Start(token));
             this.IsWorking = false;
+            this.thread.Start();
         }
+
+        public bool IsWorking { get; private set; }
 
         public void Join()
         {
@@ -99,6 +100,11 @@ public class MyThreadPool
             {
                 this.thread.Join(this.timeout);
             }
+        }
+
+        public void Interrupt()
+        {
+            this.thread.Interrupt();
         }
 
         private void Start(CancellationToken token)

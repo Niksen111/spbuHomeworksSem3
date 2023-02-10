@@ -7,7 +7,7 @@ namespace MyThreadPool;
 public interface IMyTask<TResult>
 {
     /// <summary>
-    /// Get true if the task is completed.
+    /// Gets a value indicating whether get true if the task is completed.
     /// </summary>
     bool IsCompleted { get; }
 
