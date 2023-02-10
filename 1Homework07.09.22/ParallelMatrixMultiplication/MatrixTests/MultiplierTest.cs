@@ -50,22 +50,28 @@ public class Tests
     [Test]
     public void NonRepeatableMatrices()
     {
-        var matrix1 = new[] {
-            "1 1 1", 
-            "1 1 1"};
+        var matrix1 = new[]
+        {
+            "1 1 1",
+            "1 1 1",
+        };
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix1);
-        Assert.Throws<NonMultipleMatricesException>(() => Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"), 
+        Assert.Throws<NonMultipleMatricesException>(() => Matrix.MultiplyOneThreaded(
+            new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonMultipleMatricesException>(() => Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"), 
+        Assert.Throws<NonMultipleMatricesException>(() => Matrix.Multiply(
+            new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt"));
-        
-        var matrix2 = new[] {"1 1 1", "1 1 1", "1 1"};
+
+        var matrix2 = new[] { "1 1 1", "1 1 1", "1 1" };
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix2);
-        Assert.Throws<InvalidDataException>(() => Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"), 
+        Assert.Throws<InvalidDataException>(() => Matrix.MultiplyOneThreaded(
+            new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<InvalidDataException>(() => Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"), 
+        Assert.Throws<InvalidDataException>(() => Matrix.Multiply(
+            new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt"));
     }
 
@@ -78,33 +84,36 @@ public class Tests
             line.Add("100");
         }
 
-        var line1 = String.Join(" ", line.ToArray());
+        var line1 = string.Join(" ", line.ToArray());
 
-        File.WriteAllLines("../../../TestFiles/Matrix1.txt", new []{""});
-        File.WriteAllLines("../../../TestFiles/Matrix2.txt", new []{""});
-        
+        File.WriteAllLines("../../../TestFiles/Matrix1.txt", new[] { string.Empty });
+        File.WriteAllLines("../../../TestFiles/Matrix2.txt", new[] { string.Empty });
+
         StreamWriter file1 = new("../../../TestFiles/Matrix1.txt");
         StreamWriter file2 = new("../../../TestFiles/Matrix2.txt");
-        
+
         for (int i = 0; i < 100; ++i)
         {
             if (line1 == null)
             {
                 Assert.Fail();
             }
+
             file1.WriteLine(line1);
             file2.WriteLine(line1);
         }
-        
+
         file1.Close();
         file2.Close();
 
-        Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"),
+        Matrix.MultiplyOneThreaded(
+            new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt");
-        Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"),
+        Matrix.Multiply(
+            new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt");
-        
-        Assert.IsTrue(AreMatricesIdentical("../../../TestFiles/OutputOneThread.txt", "../../../TestFiles/Result.txt"));
-        Assert.IsTrue(AreMatricesIdentical("../../../TestFiles/OutputParallel.txt", "../../../TestFiles/Result.txt"));
+
+        Assert.IsTrue(this.AreMatricesIdentical("../../../TestFiles/OutputOneThread.txt", "../../../TestFiles/Result.txt"));
+        Assert.IsTrue(this.AreMatricesIdentical("../../../TestFiles/OutputParallel.txt", "../../../TestFiles/Result.txt"));
     }
 }

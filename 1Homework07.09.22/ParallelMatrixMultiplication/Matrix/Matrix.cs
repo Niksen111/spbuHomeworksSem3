@@ -6,26 +6,39 @@ namespace ParallelMatrixMultiplication;
 public class Matrix
 {
     /// <summary>
-    /// Gives the number of rows in the matrix.
+    /// Gets gives the number of rows in the matrix.
     /// </summary>
     public int RowsCount => matrix.Count;
-    
+
     /// <summary>
-    /// Gives the number of columns in the matrix.
+    /// Gets gives the number of columns in the matrix.
     /// </summary>
-    public int ColumnsCount => matrix[0].Count;
+    public int ColumnsCount => this.matrix[0].Count;
+
     private List<List<int>> matrix;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Matrix"/> class.
+    /// </summary>
+    /// <param name="matrix">The base for creating a matrix.</param>
     public Matrix(List<List<int>> matrix)
     {
         this.matrix = matrix;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Matrix"/> class.
+    /// </summary>
+    /// <param name="path">The base for creating a matrix.</param>
     public Matrix(string path)
     {
-        matrix = GetMatrixFromFile(path);
+        this.matrix = this.GetMatrixFromFile(path);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Matrix"/> class.
+    /// </summary>
+    /// <param name="matrix">The base for creating a matrix.</param>
     public Matrix(int[][] matrix)
     {
         this.matrix = new List<List<int>>();
@@ -34,7 +47,7 @@ public class Matrix
             this.matrix.Add(new List<int>(matrix[i]));
         }
     }
-    
+
     private List<List<int>> GetMatrixFromFile(string path)
     {
         var lines = File.ReadAllLines(path);
@@ -69,26 +82,26 @@ public class Matrix
     public static Matrix Multiply(Matrix matrixA, Matrix matrixB)
     {
         CheckMatrices(matrixA, matrixB);
-        
-        (int rows, int columns) outputMatrixSize = (matrixA.RowsCount, matrixB.ColumnsCount);
-        var result = new int[outputMatrixSize.rows][];
 
-        var threadsNumber = Math.Min(Environment.ProcessorCount, outputMatrixSize.rows);
+        (int Rows, int Columns) outputMatrixSize = (matrixA.RowsCount, matrixB.ColumnsCount);
+        var result = new int[outputMatrixSize.Rows][];
+
+        var threadsNumber = Math.Min(Environment.ProcessorCount, outputMatrixSize.Rows);
         var threads = new Thread[threadsNumber];
-        var remainingCells = outputMatrixSize.rows;
+        var remainingCells = outputMatrixSize.Rows;
         var matrix1 = matrixA.ToTwoDimensionalArray();
         var matrix2 = matrixB.ToTwoDimensionalArray();
-        
+
         for (int i = 0; i < threadsNumber; ++i)
         {
-            int begin = outputMatrixSize.rows - remainingCells;
-            int end = begin + (int) Math.Ceiling((float) remainingCells / (threadsNumber - i));
+            int begin = outputMatrixSize.Rows - remainingCells;
+            int end = begin + (int)Math.Ceiling((float)remainingCells / (threadsNumber - i));
             remainingCells -= end - begin;
             threads[i] = new Thread(() =>
             {
                 for (int l = begin; l < end; ++l)
                 {
-                    var array = new int[outputMatrixSize.columns];
+                    var array = new int[outputMatrixSize.Columns];
                     for (int n = 0; n < matrixB.ColumnsCount; ++n)
                     {
                         var sum = 0;
@@ -104,7 +117,7 @@ public class Matrix
                 }
             });
         }
-        
+
         foreach (var thread in threads)
         {
             thread.Start();
@@ -117,7 +130,7 @@ public class Matrix
 
         return new Matrix(result);
     }
-    
+
     /// <summary>
     /// Multiplies matrices using a single thread.
     /// </summary>
@@ -127,24 +140,24 @@ public class Matrix
     public static Matrix MultiplyOneThreaded(Matrix matrixA, Matrix matrixB)
     {
         CheckMatrices(matrixA, matrixB);
-        
-        (int rows, int columns) outputMatrixSize = (matrixA.RowsCount, matrixB.ColumnsCount);
+
+        (int Rows, int Columns) outputMatrixSize = (matrixA.RowsCount, matrixB.ColumnsCount);
         var outputMatrix = new List<List<int>>();
 
-        for (int i = 0; i < outputMatrixSize.rows; ++i)
+        for (int i = 0; i < outputMatrixSize.Rows; ++i)
         {
             outputMatrix.Add(new List<int>());
-            for (int j = 0; j < outputMatrixSize.columns; ++j)
+            for (int j = 0; j < outputMatrixSize.Columns; ++j)
             {
                 outputMatrix[i].Add(0);
             }
         }
-        
+
         var matrix1 = matrixA.ToTwoDimensionalList();
         var matrix2 = matrixB.ToTwoDimensionalList();
-        for (int i = 0; i < outputMatrixSize.rows; ++i)
+        for (int i = 0; i < outputMatrixSize.Rows; ++i)
         {
-            for (int j = 0; j < outputMatrixSize.columns; ++j)
+            for (int j = 0; j < outputMatrixSize.Columns; ++j)
             {
                 outputMatrix[i][j] = 0;
                 for (int l = 0; l < matrixA.ColumnsCount; ++l)
@@ -163,20 +176,21 @@ public class Matrix
     /// <returns>Two-Dimensional list.</returns>
     public List<List<int>> ToTwoDimensionalList()
     {
-        return matrix;
+        return this.matrix;
     }
-    
+
     /// <summary>
     /// Converts matrix to Two-Dimensional array.
     /// </summary>
     /// <returns>Two-Dimensional array.</returns>
     public int[][] ToTwoDimensionalArray()
     {
-        var result = new int[RowsCount][];
-        for (int i = 0; i < RowsCount; ++i)
+        var result = new int[this.RowsCount][];
+        for (int i = 0; i < this.RowsCount; ++i)
         {
-            result[i] = matrix[i].ToArray();
+            result[i] = this.matrix[i].ToArray();
         }
+
         return result;
     }
 
@@ -215,16 +229,16 @@ public class Matrix
     {
         var newMatrix = new List<List<int>>();
 
-        for (int i = 0; i < ColumnsCount; ++i)
+        for (int i = 0; i < this.ColumnsCount; ++i)
         {
             newMatrix.Add(new List<int>());
-            for (int j = 0; j < RowsCount; ++j)
+            for (int j = 0; j < this.RowsCount; ++j)
             {
-                newMatrix[i].Add(matrix[j][i]);
+                newMatrix[i].Add(this.matrix[j][i]);
             }
         }
 
-        matrix = newMatrix;
+        this.matrix = newMatrix;
     }
 
     /// <summary>
@@ -233,6 +247,6 @@ public class Matrix
     /// <param name="path">path to file.</param>
     public void WriteToFile(string path)
     {
-        File.WriteAllLines(path, matrix.Select(n => string.Join(" ", n.Select(m => m.ToString()).ToArray())));
+        File.WriteAllLines(path, this.matrix.Select(n => string.Join(" ", n.Select(m => m.ToString()).ToArray())));
     }
 }
