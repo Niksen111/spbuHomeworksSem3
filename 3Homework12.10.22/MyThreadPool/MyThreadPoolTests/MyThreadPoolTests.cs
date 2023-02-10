@@ -6,6 +6,15 @@ using NUnit.Framework;
 
 public class MyThreadPoolTests
 {
+    private int threadsInThreadPoolCount = 10;
+    private MyThreadPool pool;
+
+    [SetUp]
+    public void SetUp()
+    {
+        pool = new MyThreadPool(threadsInThreadPoolCount);
+    }
+    
     [Test]
     public void ThreadPoolWorks()
     {

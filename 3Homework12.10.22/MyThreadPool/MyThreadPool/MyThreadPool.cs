@@ -68,12 +68,19 @@ public class MyThreadPool
         }
 
         this.source.Cancel();
+        var areJoined = true;
         foreach (var thread in this.threads)
         {
             thread.Join();
             if (thread.IsWorking)
             {
                 thread.Interrupt();
+                areJoined = false;
+            }
+
+            if (!areJoined)
+            {
+                throw new TimeoutException();
             }
         }
     }
