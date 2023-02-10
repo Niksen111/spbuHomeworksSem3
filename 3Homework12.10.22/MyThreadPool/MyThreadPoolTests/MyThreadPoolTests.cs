@@ -7,14 +7,7 @@ using NUnit.Framework;
 public class MyThreadPoolTests
 {
     private int threadsInThreadPoolCount = 10;
-    private MyThreadPool pool;
 
-    [SetUp]
-    public void SetUp()
-    {
-        pool = new MyThreadPool(threadsInThreadPoolCount);
-    }
-    
     [Test]
     public void ThreadPoolWorks()
     {
@@ -22,7 +15,7 @@ public class MyThreadPoolTests
         {
             return 1;
         });
-        MyThreadPool pool = new(1);
+        MyThreadPool pool = new(threadsInThreadPoolCount);
         var myTask = pool.Submit(() => x());
         Assert.AreEqual(1, myTask.Result);
         pool.Shutdown();
