@@ -116,4 +116,21 @@ public class Tests
         Assert.IsTrue(this.AreMatricesIdentical("../../../TestFiles/OutputOneThread.txt", "../../../TestFiles/Result.txt"));
         Assert.IsTrue(this.AreMatricesIdentical("../../../TestFiles/OutputParallel.txt", "../../../TestFiles/Result.txt"));
     }
+
+    [Test]
+    public void AddUpWorks()
+    {
+        var matrix = new Matrix(new int[][] { new int[] { 1, 1, 1 } });
+        var answer = new Matrix(new int[][] { new int[] { 2, 2, 2 } });
+        Assert.That(Matrix.AddUp(matrix, matrix).ToTwoDimensionalList(), Is.EqualTo(answer.ToTwoDimensionalList()));
+    }
+
+    [Test]
+    public void TransposeWorks()
+    {
+        var matrix = new Matrix(new int[][] { new int[] { 1, 1, 1 } });
+        matrix.Transpose();
+        var answer = new Matrix(new[] { new[] { 1 },  new[] { 1 }, new[] { 1 }, });
+        Assert.That(matrix.ToTwoDimensionalArray(), Is.EqualTo(answer.ToTwoDimensionalList()));
+    }
 }

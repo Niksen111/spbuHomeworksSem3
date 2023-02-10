@@ -32,3 +32,20 @@ Values with an accuracy of 10^4
 
 Ratio of expected values - 4.5730133
 
+CONFIGURATION 3
+
+Sizes of matrices - 100 x 100
+Number of iterations - 100
+
+One-thread multiplication:
+    Expected value - 23800000 stopwatch ticks
+    Standard deviation - 3800000 stopwatch ticks
+Values with an accuracy of 10^5
+
+Parallel multiplication:
+    Expected value - 5600000 stopwatch ticks
+    Standard deviation - 3100000 stopwatch ticks
+Values with an accuracy of 10^5
+
+Ratio of expected values - 4.192441
+

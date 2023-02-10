@@ -213,7 +213,7 @@ public class Matrix
         for (int i = 0; i < matrixA.RowsCount; ++i)
         {
             result.Add(new List<int>());
-            for (int j = 0; j < matrixA.ColumnsCount; ++i)
+            for (int j = 0; j < matrixA.ColumnsCount; ++j)
             {
                 result[i].Add(matrix1[i][j] + matrix2[i][j]);
             }
