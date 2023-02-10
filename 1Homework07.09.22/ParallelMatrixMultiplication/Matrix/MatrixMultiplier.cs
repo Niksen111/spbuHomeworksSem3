@@ -3,6 +3,7 @@
 /// <summary>
 /// Provides a parallel multiplication of matrices.
 /// </summary>
+/*
 public static class MatrixMultiplier
 {
     public static int ThreadsCount => Environment.ProcessorCount;
@@ -249,4 +250,4 @@ public static class MatrixMultiplier
             Interlocked.Decrement(ref activeTasks);
         }
     }
-}
+} */

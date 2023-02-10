@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelMatrixMultiplication", "ParallelMatrixMultiplication\ParallelMatrixMultiplication.csproj", "{795E88EF-60E8-4858-B963-A8D78A56C80E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrix", "Matrix\Matrix.csproj", "{795E88EF-60E8-4858-B963-A8D78A56C80E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixMultiplier.Tests", "MatrixMultiplier.Tests\MatrixMultiplier.Tests.csproj", "{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTests", "MatrixTests\MatrixTests.csproj", "{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixMultiplicationGetStatistics", "MatrixMultiplicationGetStatistics\MatrixMultiplicationGetStatistics.csproj", "{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}"
 EndProject

@@ -39,12 +39,12 @@ public class Tests
     [Test]
     public void WrongPath()
     {
-        Assert.Throws<FileNotFoundException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded(
-            "../../../TestFiles/Lol.txt",
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<FileNotFoundException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel(
-            "../../../TestFiles/Lol.txt",
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt"));
+        Assert.Throws<FileNotFoundException>(() => Matrix.MultiplyOneThreaded(
+            new Matrix("../../../TestFiles/Lol.txt"),
+            new Matrix("../../../TestFiles/Matrix2.txt")));
+        Assert.Throws<FileNotFoundException>(() => Matrix.Multiply(
+            new Matrix("../../../TestFiles/Lol.txt"),
+            new Matrix("../../../TestFiles/Matrix2.txt")));
     }
 
     [Test]
@@ -55,18 +55,18 @@ public class Tests
             "1 1 1"};
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix1);
-        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt", 
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt", 
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt"));
+        Assert.Throws<NonMultipleMatricesException>(() => Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"), 
+            new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt"));
+        Assert.Throws<NonMultipleMatricesException>(() => Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"), 
+            new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt"));
         
         var matrix2 = new[] {"1 1 1", "1 1 1", "1 1"};
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix2);
-        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt", 
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonMultipleMatricesException>(() => ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt", 
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt"));
+        Assert.Throws<NonMultipleMatricesException>(() => Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"), 
+            new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt"));
+        Assert.Throws<NonMultipleMatricesException>(() => Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"), 
+            new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt"));
     }
 
     [Test]
@@ -99,10 +99,10 @@ public class Tests
         file1.Close();
         file2.Close();
 
-        ParallelMatrixMultiplication.MatrixMultiplier.MultiplyOneThreaded("../../../TestFiles/Matrix1.txt",
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputOneThread.txt");
-        ParallelMatrixMultiplication.MatrixMultiplier.MultiplyParallel("../../../TestFiles/Matrix1.txt",
-            "../../../TestFiles/Matrix2.txt", "../../../TestFiles/OutputParallel.txt");
+        Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"),
+            new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt");
+        Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"),
+            new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt");
         
         Assert.IsTrue(AreMatricesIdentical("../../../TestFiles/OutputOneThread.txt", "../../../TestFiles/Result.txt"));
         Assert.IsTrue(AreMatricesIdentical("../../../TestFiles/OutputParallel.txt", "../../../TestFiles/Result.txt"));

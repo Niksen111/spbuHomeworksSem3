@@ -12,7 +12,9 @@ Parallel multiplication:
     Expected value - 60801594
     Standard deviation - 12175005.562660865
 
-Ratio of expected values - 2.776828CONFIGURATION 2
+Ratio of expected values - 2.776828
+
+CONFIGURATION 2
 
 Sizes of matrices - 3 x 3
 Number of iterations - 100

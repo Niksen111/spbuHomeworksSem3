@@ -6,6 +6,8 @@
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
+
+        <RootNamespace>MatrixMultiplier.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ParallelMatrixMultiplication\ParallelMatrixMultiplication.csproj" />
+      <ProjectReference Include="..\Matrix\Matrix.csproj" />
     </ItemGroup>
 
 </Project>
