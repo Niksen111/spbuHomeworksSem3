@@ -86,7 +86,7 @@ public class Matrix
             remainingCells -= end - begin;
             threads[i] = new Thread(() =>
             {
-                for (int l = begin; l <= end; ++l)
+                for (int l = begin; l < end; ++l)
                 {
                     var array = new int[outputMatrixSize.columns];
                     for (int n = 0; n < matrixB.ColumnsCount; ++n)

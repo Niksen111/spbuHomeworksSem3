@@ -63,9 +63,9 @@ public class Tests
         var matrix2 = new[] {"1 1 1", "1 1 1", "1 1"};
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix2);
-        Assert.Throws<NonMultipleMatricesException>(() => Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"), 
+        Assert.Throws<InvalidDataException>(() => Matrix.MultiplyOneThreaded(new Matrix("../../../TestFiles/Matrix1.txt"), 
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonMultipleMatricesException>(() => Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"), 
+        Assert.Throws<InvalidDataException>(() => Matrix.Multiply(new Matrix("../../../TestFiles/Matrix1.txt"), 
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt"));
     }
 

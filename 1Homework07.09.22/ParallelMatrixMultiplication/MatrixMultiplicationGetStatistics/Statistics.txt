@@ -1,32 +1,34 @@
 CONFIGURATION 1
 
-Sizes of matrices - 200 x 200
-Number of iterations - 50
-Number of threads in parallel multiplication - 15
+Sizes of matrices - 100 x 100
+Number of iterations - 100
 
 One-thread multiplication:
-    Expected value - 168835573
-    Standard deviation - 15747315.84681618
+    Expected value - 24500000 stopwatch ticks
+    Standard deviation - 3600000 stopwatch ticks
+Values with an accuracy of 10^5
 
 Parallel multiplication:
-    Expected value - 60801594
-    Standard deviation - 12175005.562660865
+    Expected value - 5600000 stopwatch ticks
+    Standard deviation - 1100000 stopwatch ticks
+Values with an accuracy of 10^5
 
-Ratio of expected values - 2.776828
+Ratio of expected values - 4.329637
 
 CONFIGURATION 2
 
-Sizes of matrices - 3 x 3
+Sizes of matrices - 100 x 100
 Number of iterations - 100
-Number of threads in parallel multiplication - 8
 
 One-thread multiplication:
-    Expected value - 0 stopwatch ticks
-    Standard deviation - 2000000 stopwatch ticks
+    Expected value - 22700000 stopwatch ticks
+    Standard deviation - 1200000 stopwatch ticks
+Values with an accuracy of 10^5
 
 Parallel multiplication:
-    Expected value - 0 stopwatch ticks
-    Standard deviation - 346410.16151377547 stopwatch ticks
+    Expected value - 4970000 stopwatch ticks
+    Standard deviation - 670000 stopwatch ticks
+Values with an accuracy of 10^4
 
-Ratio of expected values - NaN
+Ratio of expected values - 4.5730133
 
