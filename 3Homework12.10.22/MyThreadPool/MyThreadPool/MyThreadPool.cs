@@ -31,12 +31,19 @@ public class MyThreadPool
         {
             this.threads[i] = new MyThread(this.tasks, this.source.Token);
         }
+
+        isShutdown = false;
     }
 
     /// <summary>
     /// Gets number of existing threads.
     /// </summary>
     public int ThreadCount { get; }
+    
+    /// <summary>
+    /// Gets a value indicating the Shutdown status of the thread pool.
+    /// </summary>
+    public bool IsShutDown { get; private set; }
 
     /// <summary>
     /// Submits new task to the ThreadPool.
@@ -63,9 +70,14 @@ public class MyThreadPool
 
         this.tasks.CompleteAdding();
 
-        while (this.tasks.Count > 0)
+        for (int i = 0; i < 20 && this.tasks.Count > 0; ++i)
         {
             Thread.Sleep(1000);
+        }
+
+        if (this.tasks.Count > 0)
+        {
+            throw new TimeoutException("Tasks from the queue cannot be executed.");
         }
 
         this.source.Cancel();
@@ -75,14 +87,14 @@ public class MyThreadPool
             thread.Join();
             if (thread.IsWorking)
             {
-                thread.Interrupt();
                 areJoined = false;
             }
+        }
 
-            if (!areJoined)
-            {
-                throw new TimeoutException();
-            }
+        isShutdown = true;
+        if (!areJoined)
+        {
+            throw new TimeoutException("Not all tasks were accomplished.");
         }
     }
 
@@ -108,11 +120,6 @@ public class MyThreadPool
             {
                 this.thread.Join(this.timeout);
             }
-        }
-
-        public void Interrupt()
-        {
-            this.thread.Interrupt();
         }
 
         private void Start(CancellationToken token)
