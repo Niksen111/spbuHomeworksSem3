@@ -4,13 +4,13 @@ namespace ParallelMatrixMultiplication;
 /// These matrices cannot be multiplied.
 /// </summary>
 [Serializable]
-public class NonMultipleMatricesException : Exception
+public class NonMultiplicableMatricesException : Exception
 {
-    public NonMultipleMatricesException() { }
-    public NonMultipleMatricesException(string message) : base(message) { }
-    public NonMultipleMatricesException(string message, Exception inner)
+    public NonMultiplicableMatricesException() { }
+    public NonMultiplicableMatricesException(string message) : base(message) { }
+    public NonMultiplicableMatricesException(string message, Exception inner)
         : base(message, inner) { }
-    protected NonMultipleMatricesException(
+    protected NonMultiplicableMatricesException(
         System.Runtime.Serialization.SerializationInfo info,
         System.Runtime.Serialization.StreamingContext context)
         : base(info, context) { }

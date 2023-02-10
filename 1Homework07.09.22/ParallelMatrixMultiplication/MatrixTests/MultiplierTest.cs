@@ -6,8 +6,8 @@ public class Tests
 {
     private bool AreMatricesIdentical(string path1, string path2)
     {
-        StreamReader file1 = new(path1);
-        StreamReader file2 = new(path2);
+        using StreamReader file1 = new(path1);
+        using StreamReader file2 = new(path2);
 
         while (true)
         {
@@ -57,10 +57,10 @@ public class Tests
         };
         File.WriteAllLines("../../../TestFiles/Matrix1.txt", matrix1);
         File.WriteAllLines("../../../TestFiles/Matrix2.txt", matrix1);
-        Assert.Throws<NonMultipleMatricesException>(() => Matrix.MultiplyOneThreaded(
+        Assert.Throws<NonMultiplicableMatricesException>(() => Matrix.MultiplyOneThreaded(
             new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputOneThread.txt"));
-        Assert.Throws<NonMultipleMatricesException>(() => Matrix.Multiply(
+        Assert.Throws<NonMultiplicableMatricesException>(() => Matrix.Multiply(
             new Matrix("../../../TestFiles/Matrix1.txt"),
             new Matrix("../../../TestFiles/Matrix2.txt")).WriteToFile("../../../TestFiles/OutputParallel.txt"));
 

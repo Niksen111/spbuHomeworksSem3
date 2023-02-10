@@ -69,7 +69,7 @@ public class Matrix
     {
         if (matrixA.ColumnsCount != matrixB.RowsCount)
         {
-            throw new NonMultipleMatricesException();
+            throw new NonMultiplicableMatricesException();
         }
     }
 
@@ -174,10 +174,8 @@ public class Matrix
     /// Converts matrix to Two-Dimensional list.
     /// </summary>
     /// <returns>Two-Dimensional list.</returns>
-    public List<List<int>> ToTwoDimensionalList()
-    {
-        return this.matrix;
-    }
+    public List<List<int>> ToTwoDimensionalList() => this.matrix;
+    
 
     /// <summary>
     /// Converts matrix to Two-Dimensional array.
@@ -245,8 +243,6 @@ public class Matrix
     /// Writes the matrix to a file.
     /// </summary>
     /// <param name="path">path to file.</param>
-    public void WriteToFile(string path)
-    {
-        File.WriteAllLines(path, this.matrix.Select(n => string.Join(" ", n.Select(m => m.ToString()).ToArray())));
-    }
+    public void WriteToFile(string path) 
+        => File.WriteAllLines(path, this.matrix.Select(n => string.Join(" ", n.Select(m => m.ToString()).ToArray())));
 }
