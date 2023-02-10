@@ -1,21 +1,19 @@
 namespace MyThreadPool.Tests;
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-
-using System;
-
 using NUnit.Framework;
 
 public class MyThreadPoolTests
 {
     private int threadsInThreadPoolCount = 10;
-    
+
     [Test]
     public void AtLeastNThreadsInThePool()
     {
-        MyThreadPool pool = new(threadsInThreadPoolCount);
+        MyThreadPool pool = new(this.threadsInThreadPoolCount);
         var func = new Func<int>(() =>
         {
             Thread.Sleep(5000);
@@ -25,18 +23,19 @@ public class MyThreadPoolTests
         var stopwatch = new Stopwatch();
         var tasks = new List<IMyTask<int>>();
         stopwatch.Start();
-        for (int i = 0; i < threadsInThreadPoolCount; ++i)
+        for (int i = 0; i < this.threadsInThreadPoolCount; ++i)
         {
             tasks.Add(pool.Submit(() => func()));
         }
 
-        for (int i = 0; i < threadsInThreadPoolCount; ++i)
+        for (int i = 0; i < this.threadsInThreadPoolCount; ++i)
         {
             Assert.AreEqual(1, tasks[i].Result);
         }
-        
+
         stopwatch.Stop();
         Assert.Less(stopwatch.ElapsedMilliseconds, 10000);
+        Assert.AreEqual(10, pool.ThreadCount);
 
         pool.Shutdown();
     }
@@ -44,7 +43,7 @@ public class MyThreadPoolTests
     [Test]
     public void ManyTasksWorks()
     {
-        MyThreadPool pool = new(threadsInThreadPoolCount);
+        MyThreadPool pool = new(this.threadsInThreadPoolCount);
         var func = new Func<int>(() =>
         {
             int x = 0;
@@ -52,10 +51,10 @@ public class MyThreadPoolTests
             {
                 x += i;
             }
-            
+
             return x;
         });
-        
+
         var tasks = new List<IMyTask<int>>();
         for (int i = 0; i < 500; ++i)
         {
@@ -69,8 +68,7 @@ public class MyThreadPoolTests
 
         pool.Shutdown();
     }
-    
-    
+
     [Test]
     public void ShutdownWorksWithEndlessProcess()
     {
@@ -80,13 +78,13 @@ public class MyThreadPoolTests
             Thread.Sleep(20000);
             return 1;
         });
-        
+
         var tasks = new List<IMyTask<int>>();
         for (int i = 0; i < 2; ++i)
         {
             tasks.Add(pool.Submit(() => func()));
         }
-        
+
         for (int i = 0; i < 10; ++i)
         {
             tasks.Add(pool.Submit(() => 2 * 2));
@@ -98,12 +96,12 @@ public class MyThreadPoolTests
         }
 
         Assert.Catch<TimeoutException>(pool.Shutdown);
-    } 
-    
+    }
+
     [Test]
     public void SeveralContinueWithWorks()
     {
-        MyThreadPool pool = new(threadsInThreadPoolCount);
+        MyThreadPool pool = new(this.threadsInThreadPoolCount);
         var func1 = new Func<int>(() =>
         {
             Thread.Sleep(500);
@@ -142,8 +140,8 @@ public class MyThreadPoolTests
             Thread.Sleep(5000);
             return 1;
         });
-        
-        var func2 = new Func<int, int>( x => 2 * x );
+
+        var func2 = new Func<int, int>(x => 2 * x);
 
         var stopwatch = new Stopwatch();
         var tasks = new List<IMyTask<int>>();
@@ -151,7 +149,7 @@ public class MyThreadPoolTests
         tasks.Add(pool.Submit(() => func1()));
         tasks.Add(tasks[0].ContinueWith(func2));
         tasks.Add(pool.Submit(() => func1()));
-        
+
         Assert.AreEqual(1, tasks[0].Result);
         Assert.AreEqual(2, tasks[1].Result);
         Assert.AreEqual(1, tasks[2].Result);

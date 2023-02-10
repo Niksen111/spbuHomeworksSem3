@@ -10,7 +10,7 @@ public class MyThreadPool
     private BlockingCollection<Action> tasks;
     private MyThread[] threads;
     private CancellationTokenSource source = new();
-    private bool isShutdown = false;
+    private bool isShutdown;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MyThreadPool"/> class.
@@ -32,18 +32,13 @@ public class MyThreadPool
             this.threads[i] = new MyThread(this.tasks, this.source.Token);
         }
 
-        isShutdown = false;
+        this.isShutdown = false;
     }
 
     /// <summary>
     /// Gets number of existing threads.
     /// </summary>
     public int ThreadCount { get; }
-    
-    /// <summary>
-    /// Gets a value indicating the Shutdown status of the thread pool.
-    /// </summary>
-    public bool IsShutDown { get; private set; }
 
     /// <summary>
     /// Submits new task to the ThreadPool.
@@ -91,7 +86,7 @@ public class MyThreadPool
             }
         }
 
-        isShutdown = true;
+        this.isShutdown = true;
         if (!areJoined)
         {
             throw new TimeoutException("Not all tasks were accomplished.");
@@ -139,7 +134,7 @@ public class MyThreadPool
             }
         }
     }
-    
+
     private class MyTask<T> : IMyTask<T>
     {
         private MyThreadPool pool;
@@ -157,7 +152,7 @@ public class MyThreadPool
         {
             this.func = func;
             this.pool = threadPool;
-            IsCompleted = false;
+            this.IsCompleted = false;
         }
 
         /// <inheritdoc/>
