@@ -1,8 +1,6 @@
-using System;
-using System.IO;
-
 namespace SimpleFtp.Tests;
 
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +46,7 @@ public class ClientTests
         Assert.AreEqual("1 ../../Debug true ", this.client!.ListAsync(stream, "../../").Result);
         Assert.AreEqual(this.simpleFtpTestsListing, this.client!.ListAsync(stream, "../../../").Result);
         Assert.AreEqual(
-            "4 ../../../TestingFiles/ABCD.cmf false ../../../TestingFiles/ABCD1.cmf false ../../../TestingFiles/kek.txt false ../../../TestingFiles/kek1.txt false ", 
+            "4 ../../../TestingFiles/ABCD.cmf false ../../../TestingFiles/ABCD1.cmf false ../../../TestingFiles/kek.txt false ../../../TestingFiles/kek1.txt false ",
             this.client!.ListAsync(stream, "../../../TestingFiles").Result);
     }
 
