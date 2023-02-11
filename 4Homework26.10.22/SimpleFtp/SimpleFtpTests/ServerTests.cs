@@ -1,37 +1,37 @@
-using System;
-using System.IO;
-
 namespace SimpleFtp.Tests;
 
+using System;
+using System.IO;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 public class ServerTests
 {
     private Server.Server? server;
     private CancellationTokenSource? source;
+    private int port = 6666;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        source = new CancellationTokenSource();
-        server = new Server.Server(source.Token);
-        Task.Run(() => server.Start(8080));
+        this.source = new CancellationTokenSource();
+        this.server = new Server.Server(this.source.Token);
+        Task.Run(() => this.server.Start(this.port));
     }
 
     [OneTimeTearDown]
     public void OneTimeTearDown()
     {
-        source!.Cancel();
+        this.source!.Cancel();
     }
-    
+
     [Test]
     public void ListingWorks()
     {
         using var client = new TcpClient();
-        client.Connect("127.0.0.1", 8080);
+        client.Connect("127.0.0.1", this.port);
         using var stream = client.GetStream();
         var writer = new StreamWriter(stream);
         var reader = new StreamReader(stream);
@@ -45,41 +45,41 @@ public class ServerTests
         response = reader.ReadLine();
         Assert.AreEqual("1 ../net6.0 true ", response);
     }
-    
+
     [Test]
     public void GetWorks()
     {
         using var client = new TcpClient();
-        client.Connect("127.0.0.1", 8080);
+        client.Connect("127.0.0.1", this.port);
         using var stream = client.GetStream();
         var writer = new StreamWriter(stream);
-        writer.WriteLine("2 ../../../kek.txt");
+        writer.WriteLine("2 ../../../TestingFiles/kek.txt");
         writer.Flush();
-        var response = ReadFileFromStream(stream);
+        var response = this.ReadFileFromStream(stream);
         Assert.AreEqual("MathMech isn't for everyone", response.Result);
     }
-    
+
     [Test]
     public void ServerWorksWithSeveralClients()
     {
         using var client1 = new TcpClient();
-        client1.Connect("127.0.0.1", 8080);
+        client1.Connect("127.0.0.1", this.port);
         using var stream1 = client1.GetStream();
         var writer1 = new StreamWriter(stream1);
         var reader1 = new StreamReader(stream1);
-        
+
         using var client2 = new TcpClient();
-        client2.Connect("127.0.0.1", 8080);
+        client2.Connect("127.0.0.1", this.port);
         using var stream2 = client2.GetStream();
         var writer2 = new StreamWriter(stream2);
         var reader2 = new StreamReader(stream2);
-        
+
         using var client3 = new TcpClient();
-        client3.Connect("127.0.0.1", 8080);
+        client3.Connect("127.0.0.1", this.port);
         using var stream3 = client3.GetStream();
         var writer3 = new StreamWriter(stream3);
         var reader3 = new StreamReader(stream3);
-        
+
         writer1.WriteLine("1 ../../");
         writer1.Flush();
         var response = reader1.ReadLine();
@@ -89,7 +89,7 @@ public class ServerTests
         writer2.Flush();
         response = reader2.ReadLine();
         Assert.AreEqual("1 ../net6.0 true ", response);
-        
+
         writer3.WriteLine("1 ../../");
         writer3.Flush();
         response = reader3.ReadLine();
@@ -100,12 +100,12 @@ public class ServerTests
         response = reader2.ReadLine();
         Assert.AreEqual("1 ../net6.0 true ", response);
     }
-    
+
     [Test]
     public void NonexistentFileRequestWorks()
     {
         using var client = new TcpClient();
-        client.Connect("127.0.0.1", 8080);
+        client.Connect("127.0.0.1", this.port);
         using var stream = client.GetStream();
         var writer = new StreamWriter(stream);
         var reader = new StreamReader(stream);

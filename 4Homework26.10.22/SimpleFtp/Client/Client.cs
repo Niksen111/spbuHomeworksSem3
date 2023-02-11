@@ -85,7 +85,7 @@ public class Client
             throw new IOException();
         }
 
-        response += System.Text.Encoding.Default.GetString(buffer);
+        response += System.Text.Encoding.UTF8.GetString(buffer);
         return response;
     }
 

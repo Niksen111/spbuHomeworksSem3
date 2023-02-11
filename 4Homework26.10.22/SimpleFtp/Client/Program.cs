@@ -24,10 +24,10 @@ internal static class Program
             throw new InvalidDataException();
         }
 
-        using var client = new TcpClient();
-        await client.ConnectAsync(args[0], port);
-        await using var stream = client.GetStream();
-        var clinet = new Client();
+        using var tcpClient = new TcpClient();
+        await tcpClient.ConnectAsync(args[0], port);
+        await using var stream = tcpClient.GetStream();
+        var client = new Client();
 
         Console.WriteLine("Type \"help\" to see a list of commands");
 
@@ -61,7 +61,7 @@ internal static class Program
                         throw new InvalidDataException();
                     }
 
-                    Console.WriteLine(await clinet.ListAsync(stream, request[1]));
+                    Console.WriteLine(await client.ListAsync(stream, request[1]));
                     break;
                 }
 
@@ -72,7 +72,7 @@ internal static class Program
                         throw new InvalidDataException();
                     }
 
-                    var response = await clinet.GetAsync(stream, request[1]);
+                    var response = await client.GetAsync(stream, request[1]);
                     Console.WriteLine(response);
                     break;
                 }
@@ -84,7 +84,7 @@ internal static class Program
                         throw new InvalidDataException();
                     }
 
-                    await clinet.DownloadAsync(stream, request[1], request[2]);
+                    await client.DownloadAsync(stream, request[1], request[2]);
                     Console.WriteLine("Success.");
                     break;
                 }
