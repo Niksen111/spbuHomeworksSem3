@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{B443D8D0-3D13-4DA8-BB9B-FF53F00A12E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFtp.Tests", "SimpleFtp.Tests\SimpleFtp.Tests.csproj", "{F258FF4C-1107-41FE-86B9-9A72D7FD1C59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFtpTests", "SimpleFtpTests\SimpleFtpTests.csproj", "{F258FF4C-1107-41FE-86B9-9A72D7FD1C59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

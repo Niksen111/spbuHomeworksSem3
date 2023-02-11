@@ -2,6 +2,7 @@
 
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 /// <summary>
 /// A server handling two requests:
@@ -34,11 +35,11 @@ public class Server
         while (!this.token.IsCancellationRequested)
         {
             var socket = await listener.AcceptSocketAsync();
-            await Task.Run(() => this.Session(socket));
+            Task.Run(() => this.Session(socket, this.token));
         }
     }
 
-    private async Task Session(Socket socket)
+    private async Task Session(Socket socket, CancellationToken cancellation)
     {
         try
         {
@@ -47,6 +48,11 @@ public class Server
             var writer = new StreamWriter(stream);
             while (true)
             {
+                if (cancellation.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 var line = await listener.ReadLineAsync();
                 if (line == null)
                 {
@@ -128,7 +134,38 @@ public class Server
             return;
         }
 
+        var fileInfo = new FileInfo(path);
+        var length = fileInfo.Length;
+        var lengthBytes = BitConverter.GetBytes(length);
+        await stream.WriteAsync(lengthBytes);
+        var x = Encoding.UTF8.GetBytes(" ");
+        await stream.WriteAsync(x);
         await using var reader = new FileStream(path, FileMode.Open);
-        await reader.CopyToAsync(stream);
+
+        var leftToWrite = length;
+        var bufferSize = 1000000;
+        var buffer = new byte[bufferSize];
+        int wasRead;
+        while (leftToWrite > bufferSize)
+        {
+            leftToWrite -= bufferSize;
+            wasRead = await reader.ReadAsync(buffer, 0, bufferSize);
+            if (wasRead != bufferSize)
+            {
+                throw new IOException();
+            }
+
+            await stream.WriteAsync(buffer);
+        }
+
+        wasRead = await reader.ReadAsync(buffer, 0, (int)leftToWrite);
+        if (wasRead != (int)leftToWrite)
+        {
+            throw new IOException();
+        }
+
+        await stream.WriteAsync(buffer, 0, (int)leftToWrite);
+        await stream.FlushAsync();
+        reader.Close();
     }
 }

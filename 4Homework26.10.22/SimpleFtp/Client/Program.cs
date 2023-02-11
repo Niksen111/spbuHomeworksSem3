@@ -28,8 +28,6 @@ internal static class Program
         await client.ConnectAsync(args[0], port);
         await using var stream = client.GetStream();
         var clinet = new Client();
-        await using var writer = new StreamWriter(stream);
-        using var reader = new StreamReader(stream);
 
         Console.WriteLine("Type \"help\" to see a list of commands");
 
@@ -63,18 +61,31 @@ internal static class Program
                         throw new InvalidDataException();
                     }
 
-                    Console.WriteLine(await clinet.ListAsync(writer, reader, request[1]));
+                    Console.WriteLine(await clinet.ListAsync(stream, request[1]));
                     break;
                 }
 
                 case "2":
+                {
+                    if (request.Length != 2)
+                    {
+                        throw new InvalidDataException();
+                    }
+
+                    var response = await clinet.GetAsync(stream, request[1]);
+                    Console.WriteLine(response);
+                    break;
+                }
+
+                case "3":
                 {
                     if (request.Length != 3)
                     {
                         throw new InvalidDataException();
                     }
 
-                    await clinet.GetAsync(stream, writer, request[1], request[2]);
+                    await clinet.DownloadAsync(stream, request[1], request[2]);
+                    Console.WriteLine("Success.");
                     break;
                 }
 
@@ -92,8 +103,9 @@ internal static class Program
         Console.WriteLine("Usage: [command] PATH");
         Console.WriteLine();
         Console.WriteLine("Commands:");
-        Console.WriteLine(" 1        listing of files in the directory on the server");
-        Console.WriteLine(" 2        download file from the server");
+        Console.WriteLine(" 1 <path>   listing of files in the directory on the server");
+        Console.WriteLine(" 2 <path>   read file from the server");
+        Console.WriteLine(" 3 <path> <path to the new file> download file from the server");
         Console.WriteLine();
         Console.WriteLine("q  -  quit");
     }
@@ -101,5 +113,6 @@ internal static class Program
     private static void PrintFailed()
     {
         Console.WriteLine("Failed to read request");
+        Console.WriteLine("Type \"help\" to see a list of commands");
     }
 }
