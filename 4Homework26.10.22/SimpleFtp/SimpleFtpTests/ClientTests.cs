@@ -46,7 +46,7 @@ public class ClientTests
         Assert.AreEqual("1 ../../Debug true ", this.client!.ListAsync(stream, "../../").Result);
         Assert.AreEqual(this.simpleFtpTestsListing, this.client!.ListAsync(stream, "../../../").Result);
         Assert.AreEqual(
-            "4 ../../../TestingFiles/ABCD.cmf false ../../../TestingFiles/ABCD1.cmf false ../../../TestingFiles/kek.txt false ../../../TestingFiles/kek1.txt false ",
+            "4 ../../../TestingFiles/ABCD.axax false ../../../TestingFiles/ABCD1.axax false ../../../TestingFiles/kek.txt false ../../../TestingFiles/kek1.txt false ",
             this.client!.ListAsync(stream, "../../../TestingFiles").Result);
     }
 
@@ -58,7 +58,7 @@ public class ClientTests
         using var stream = tcpClient.GetStream();
 
         Assert.AreEqual("MathMech isn't for everyone", this.client!.GetAsync(stream, "../../../TestingFiles/kek.txt").Result);
-        Assert.AreEqual("MathMech is the best", this.client!.GetAsync(stream, "../../../TestingFiles/ABCD.cmf").Result);
+        Assert.AreEqual("MathMech is the best", this.client!.GetAsync(stream, "../../../TestingFiles/ABCD.axax").Result);
     }
 
     [Test]
@@ -69,10 +69,10 @@ public class ClientTests
         using var stream = tcpClient.GetStream();
 
         await this.client!.DownloadAsync(stream, "../../../TestingFiles/kek.txt", "../../../TestingFiles/kek1.txt");
-        await this.client!.DownloadAsync(stream, "../../../TestingFiles/ABCD.cmf", "../../../TestingFiles/ABCD1.cmf");
+        await this.client!.DownloadAsync(stream, "../../../TestingFiles/ABCD.axax", "../../../TestingFiles/ABCD1.axax");
 
         Assert.IsTrue(this.FileCompare("../../../TestingFiles/kek.txt", "../../../TestingFiles/kek1.txt"));
-        Assert.IsTrue(this.FileCompare("../../../TestingFiles/ABCD.cmf", "../../../TestingFiles/ABCD1.cmf"));
+        Assert.IsTrue(this.FileCompare("../../../TestingFiles/ABCD.axax", "../../../TestingFiles/ABCD1.axax"));
     }
 
     private bool FileCompare(string file1, string file2)
