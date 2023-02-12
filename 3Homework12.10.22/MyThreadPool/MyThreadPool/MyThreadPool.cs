@@ -11,6 +11,8 @@ public class MyThreadPool
     private MyThread[] threads;
     private CancellationTokenSource source = new();
     private bool isShutdown;
+    private AutoResetEvent tasksOver;
+    private AutoResetEvent taskAdded;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MyThreadPool"/> class.
@@ -26,10 +28,12 @@ public class MyThreadPool
         this.ThreadCount = threadCount;
         this.tasks = new();
         this.threads = new MyThread[threadCount];
+        this.tasksOver = new AutoResetEvent(false);
+        this.taskAdded = new AutoResetEvent(false);
 
         for (int i = 0; i < threadCount; ++i)
         {
-            this.threads[i] = new MyThread(this.tasks, this.source.Token);
+            this.threads[i] = new MyThread(this.tasks, this.source.Token, this.tasksOver, this.taskAdded);
         }
 
         this.isShutdown = false;
@@ -50,6 +54,7 @@ public class MyThreadPool
     {
         var task = new MyTask<TResult>(func, this);
         this.tasks.Add(() => task.Start());
+        this.taskAdded.Set();
         return task;
     }
 
@@ -64,11 +69,14 @@ public class MyThreadPool
         }
 
         this.tasks.CompleteAdding();
-
-        for (int i = 0; i < 20 && this.tasks.Count > 0; ++i)
+        var timeoutThread = new Thread(() =>
         {
-            Thread.Sleep(1000);
-        }
+            Thread.Sleep(20000);
+            this.tasksOver.Set();
+        });
+
+        timeoutThread.Start();
+        this.tasksOver.WaitOne();
 
         if (this.tasks.Count > 0)
         {
@@ -76,6 +84,12 @@ public class MyThreadPool
         }
 
         this.source.Cancel();
+
+        for (int i = 0; i < this.ThreadCount; i++)
+        {
+            this.taskAdded.Set();
+        }
+
         var areJoined = true;
         foreach (var thread in this.threads)
         {
@@ -98,10 +112,14 @@ public class MyThreadPool
         private Thread thread;
         private BlockingCollection<Action> collection;
         private int timeout = 5000;
+        private AutoResetEvent tasksOver;
+        private AutoResetEvent taskAdded;
 
-        public MyThread(BlockingCollection<Action> collection, CancellationToken token)
+        public MyThread(BlockingCollection<Action> collection, CancellationToken token, AutoResetEvent tasksOver, AutoResetEvent taskAdded)
         {
+            this.tasksOver = tasksOver;
             this.collection = collection;
+            this.taskAdded = taskAdded;
             this.thread = new Thread(() => this.Start(token));
             this.IsWorking = false;
             this.thread.Start();
@@ -129,7 +147,8 @@ public class MyThreadPool
                 }
                 else
                 {
-                    Thread.Sleep(1000);
+                    this.tasksOver.Set();
+                    this.taskAdded.WaitOne();
                 }
             }
         }
@@ -138,8 +157,8 @@ public class MyThreadPool
     private class MyTask<T> : IMyTask<T>
     {
         private MyThreadPool pool;
-        private Func<T> func;
-        private ManualResetEvent reset = new(false);
+        private Func<T>? func;
+        private ManualResetEvent resetEvent = new(false);
         private T? result;
         private Exception? returnedException;
 
@@ -163,7 +182,7 @@ public class MyThreadPool
         {
             get
             {
-                this.reset.WaitOne();
+                this.resetEvent.WaitOne();
                 if (this.returnedException != null)
                 {
                     throw new AggregateException(this.returnedException);
@@ -177,7 +196,7 @@ public class MyThreadPool
         {
             try
             {
-                this.result = this.func();
+                this.result = this.func!();
             }
             catch (Exception exception)
             {
@@ -185,8 +204,9 @@ public class MyThreadPool
             }
             finally
             {
-                this.reset.Set();
+                this.func = null;
                 this.IsCompleted = true;
+                this.resetEvent.Set();
             }
         }
 
