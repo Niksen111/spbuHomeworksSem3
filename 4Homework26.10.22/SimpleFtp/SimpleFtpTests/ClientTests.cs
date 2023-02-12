@@ -57,8 +57,8 @@ public class ClientTests
         tcpClient.Connect("127.0.0.1", this.port);
         using var stream = tcpClient.GetStream();
 
-        Assert.AreEqual("MathMech isn't for everyone", this.client!.GetAsync(stream, "../../../TestingFiles/kek.txt").Result);
-        Assert.AreEqual("MathMech is the best", this.client!.GetAsync(stream, "../../../TestingFiles/ABCD.axax").Result);
+        Assert.AreEqual("MathMech isn't for everyone", this.client!.GetAsync(stream, $"../../../TestingFiles{Path.DirectorySeparatorChar}kek.txt").Result);
+        Assert.AreEqual("MathMech is the best", this.client!.GetAsync(stream, $"../../../TestingFiles{Path.DirectorySeparatorChar}ABCD.axax").Result);
     }
 
     [Test]
@@ -68,11 +68,11 @@ public class ClientTests
         tcpClient.Connect("127.0.0.1", this.port);
         using var stream = tcpClient.GetStream();
 
-        await this.client!.DownloadAsync(stream, "../../../TestingFiles/kek.txt", "../../../TestingFiles/kek1.txt");
-        await this.client!.DownloadAsync(stream, "../../../TestingFiles/ABCD.axax", "../../../TestingFiles/ABCD1.axax");
+        await this.client!.DownloadAsync(stream, $"../../../TestingFiles{Path.DirectorySeparatorChar}kek.txt", "../../../TestingFiles/kek1.txt");
+        await this.client!.DownloadAsync(stream, $"../../../TestingFiles{Path.DirectorySeparatorChar}ABCD.axax", "../../../TestingFiles/ABCD1.axax");
 
-        Assert.IsTrue(this.FileCompare("../../../TestingFiles/kek.txt", "../../../TestingFiles/kek1.txt"));
-        Assert.IsTrue(this.FileCompare("../../../TestingFiles/ABCD.axax", "../../../TestingFiles/ABCD1.axax"));
+        Assert.IsTrue(this.FileCompare($"../../../TestingFiles{Path.DirectorySeparatorChar}kek.txt", "../../../TestingFiles/kek1.txt"));
+        Assert.IsTrue(this.FileCompare($"../../../TestingFiles{Path.DirectorySeparatorChar}ABCD.axax", "../../../TestingFiles/ABCD1.axax"));
     }
 
     private bool FileCompare(string file1, string file2)
