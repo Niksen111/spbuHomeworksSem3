@@ -213,7 +213,16 @@ public class MyThreadPool
         /// <inheritdoc/>
         public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<T, TNewResult> func1)
         {
-            return this.pool.Submit(() => func1(this.Result));
+            TNewResult NewFunc()
+            {
+                T realResult = this.Result;
+                return this.pool.Submit(() => func1(realResult)).Result;
+            }
+
+            var newTask = new MyTask<TNewResult>(NewFunc, this.pool);
+            var thread = new Thread(() => newTask.Start());
+            thread.Start();
+            return newTask;
         }
     }
 }
