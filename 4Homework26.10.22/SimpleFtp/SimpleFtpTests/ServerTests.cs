@@ -12,19 +12,21 @@ public class ServerTests
     private Server.Server? server;
     private CancellationTokenSource? source;
     private int port = 6666;
+    private Task? serverState;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         this.source = new CancellationTokenSource();
         this.server = new Server.Server(this.source.Token);
-        Task.Run(() => this.server.Start(this.port));
+        this.serverState = Task.Run(() => this.server.Start(this.port), this.source.Token);
     }
 
     [OneTimeTearDown]
-    public void OneTimeTearDown()
+    public async Task OneTimeTearDown()
     {
         this.source!.Cancel();
+        await this.serverState!;
     }
 
     [Test]
@@ -33,8 +35,8 @@ public class ServerTests
         using var client = new TcpClient();
         client.Connect("127.0.0.1", this.port);
         using var stream = client.GetStream();
-        var writer = new StreamWriter(stream);
-        var reader = new StreamReader(stream);
+        using var writer = new StreamWriter(stream);
+        using var reader = new StreamReader(stream);
         writer.WriteLine("1 ../../");
         writer.Flush();
         var response = reader.ReadLine();
@@ -52,7 +54,7 @@ public class ServerTests
         using var client = new TcpClient();
         client.Connect("127.0.0.1", this.port);
         using var stream = client.GetStream();
-        var writer = new StreamWriter(stream);
+        using var writer = new StreamWriter(stream);
         writer.WriteLine("2 ../../../TestingFiles/kek.txt");
         writer.Flush();
         var response = this.ReadFileFromStream(stream);
@@ -65,8 +67,8 @@ public class ServerTests
         using var client1 = new TcpClient();
         client1.Connect("127.0.0.1", this.port);
         using var stream1 = client1.GetStream();
-        var writer1 = new StreamWriter(stream1);
-        var reader1 = new StreamReader(stream1);
+        using var writer1 = new StreamWriter(stream1);
+        using var reader1 = new StreamReader(stream1);
 
         using var client2 = new TcpClient();
         client2.Connect("127.0.0.1", this.port);
@@ -77,8 +79,8 @@ public class ServerTests
         using var client3 = new TcpClient();
         client3.Connect("127.0.0.1", this.port);
         using var stream3 = client3.GetStream();
-        var writer3 = new StreamWriter(stream3);
-        var reader3 = new StreamReader(stream3);
+        using var writer3 = new StreamWriter(stream3);
+        using var reader3 = new StreamReader(stream3);
 
         writer1.WriteLine("1 ../../");
         writer1.Flush();
@@ -107,8 +109,8 @@ public class ServerTests
         using var client = new TcpClient();
         client.Connect("127.0.0.1", this.port);
         using var stream = client.GetStream();
-        var writer = new StreamWriter(stream);
-        var reader = new StreamReader(stream);
+        using var writer = new StreamWriter(stream);
+        using var reader = new StreamReader(stream);
         writer.WriteLine("2 ./abdfdf.sus");
         writer.Flush();
         var response = reader.ReadLine();

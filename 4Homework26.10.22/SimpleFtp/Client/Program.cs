@@ -1,104 +1,97 @@
-﻿namespace Client;
+﻿using System.Net.Sockets;
 
-using System.Net.Sockets;
-
-/// <summary>
-/// Console application for interaction with the server.
-/// </summary>
-internal static class Program
+if (args.Length != 2)
 {
-    /// <summary>
-    /// Starts the application.
-    /// </summary>
-    /// <param name="args">Host Ip and port number.</param>
-    /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    public static async Task Main(string[] args)
+    throw new InvalidDataException();
+}
+
+if (!int.TryParse(args[1], out int port) || port < 0 || port > 65535)
+{
+    throw new InvalidDataException();
+}
+
+using var tcpClient = new TcpClient();
+await tcpClient.ConnectAsync(args[0], port);
+await using var stream = tcpClient.GetStream();
+var client = new Client.Client();
+
+Console.WriteLine("Type \"help\" to see a list of commands");
+
+while (true)
+{
+    var line = Console.ReadLine();
+    if (line == null)
     {
-        if (args.Length != 2)
-        {
-            throw new InvalidDataException();
-        }
-
-        if (!int.TryParse(args[1], out int port) || port < 0 || port > 65535)
-        {
-            throw new InvalidDataException();
-        }
-
-        using var tcpClient = new TcpClient();
-        await tcpClient.ConnectAsync(args[0], port);
-        await using var stream = tcpClient.GetStream();
-        var client = new Client();
-
-        Console.WriteLine("Type \"help\" to see a list of commands");
-
-        while (true)
-        {
-            var line = Console.ReadLine();
-            if (line == null)
-            {
-                return;
-            }
-
-            if (string.CompareOrdinal(line, "q") == 0)
-            {
-                return;
-            }
-
-            if (string.CompareOrdinal(line, "help") == 0)
-            {
-                PrintHelp();
-                continue;
-            }
-
-            var request = line.Split();
-
-            switch (request[0])
-            {
-                case "1":
-                {
-                    if (request.Length != 2)
-                    {
-                        throw new InvalidDataException();
-                    }
-
-                    Console.WriteLine(await client.ListAsync(stream, request[1]));
-                    break;
-                }
-
-                case "2":
-                {
-                    if (request.Length != 2)
-                    {
-                        throw new InvalidDataException();
-                    }
-
-                    var response = await client.GetAsync(stream, request[1]);
-                    Console.WriteLine(response);
-                    break;
-                }
-
-                case "3":
-                {
-                    if (request.Length != 3)
-                    {
-                        throw new InvalidDataException();
-                    }
-
-                    await client.DownloadAsync(stream, request[1], request[2]);
-                    Console.WriteLine("Success.");
-                    break;
-                }
-
-                default:
-                {
-                    PrintFailed();
-                    break;
-                }
-            }
-        }
+        return;
     }
 
-    private static void PrintHelp()
+    if (string.CompareOrdinal(line, "q") == 0)
+    {
+        return;
+    }
+
+    if (string.CompareOrdinal(line, "help") == 0)
+    {
+        PrintFunctions.PrintHelp();
+        continue;
+    }
+
+    var request = line.Split();
+
+    switch (request[0])
+    {
+        case "1":
+        {
+            if (request.Length != 2)
+            {
+                throw new InvalidDataException();
+            }
+
+            Console.WriteLine(await client.ListAsync(stream, request[1]));
+            break;
+        }
+
+        case "2":
+        {
+            if (request.Length != 2)
+            {
+                throw new InvalidDataException();
+            }
+
+            var response = await client.GetAsync(stream, request[1]);
+            Console.WriteLine(response);
+            break;
+        }
+
+        case "3":
+        {
+            if (request.Length != 3)
+            {
+                throw new InvalidDataException();
+            }
+
+            await client.DownloadAsync(stream, request[1], request[2]);
+            Console.WriteLine("Success.");
+            break;
+        }
+
+        default:
+        {
+            PrintFunctions.PrintFailed();
+            break;
+        }
+    }
+}
+
+/// <summary>
+/// Functions for printing auxiliary information.
+/// </summary>
+static class PrintFunctions
+{
+    /// <summary>
+    /// Prints a set of commands.
+    /// </summary>
+    public static void PrintHelp()
     {
         Console.WriteLine("Usage: [command] PATH");
         Console.WriteLine();
@@ -110,7 +103,10 @@ internal static class Program
         Console.WriteLine("q  -  quit");
     }
 
-    private static void PrintFailed()
+    /// <summary>
+    /// Prints an error message.
+    /// </summary>
+    public static void PrintFailed()
     {
         Console.WriteLine("Failed to read request");
         Console.WriteLine("Type \"help\" to see a list of commands");

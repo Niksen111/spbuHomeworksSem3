@@ -7,13 +7,14 @@ var source = new CancellationTokenSource();
 
 var server = new Server.Server(source.Token);
 
-Task.Run(() => server.Start(port));
+var serverState = Task.Run(() => server.Start(port));
 Console.WriteLine("Press Enter to stop the server.");
 while (true)
 {
     if (Console.ReadKey().Key == ConsoleKey.Enter)
     {
         source.Cancel();
+        await serverState;
         break;
     }
 }

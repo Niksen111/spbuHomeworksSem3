@@ -12,6 +12,7 @@ using System.Text;
 public class Server
 {
     private CancellationToken token;
+    private List<Task> sessions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Server"/> class.
@@ -20,6 +21,7 @@ public class Server
     public Server(CancellationToken token)
     {
         this.token = token;
+        this.sessions = new List<Task>();
     }
 
     /// <summary>
@@ -34,8 +36,20 @@ public class Server
 
         while (!this.token.IsCancellationRequested)
         {
-            var socket = await listener.AcceptSocketAsync();
-            Task.Run(() => this.Session(socket, this.token));
+            try
+            {
+                var socket = await listener.AcceptSocketAsync(this.token);
+                this.sessions.Add(Task.Run(() => this.Session(socket, this.token), this.token));
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
+
+        foreach (var session in this.sessions)
+        {
+            await session;
         }
     }
 
@@ -43,9 +57,9 @@ public class Server
     {
         try
         {
-            var stream = new NetworkStream(socket);
-            var listener = new StreamReader(stream);
-            var writer = new StreamWriter(stream);
+            await using var stream = new NetworkStream(socket);
+            using var listener = new StreamReader(stream);
+            await using var writer = new StreamWriter(stream);
             while (true)
             {
                 if (cancellation.IsCancellationRequested)
@@ -106,8 +120,8 @@ public class Server
             return;
         }
 
-        List<string> directories = new List<string>(Directory.GetDirectories(path));
-        List<string> files = new List<string>(Directory.GetFiles(path));
+        var directories = new List<string>(Directory.GetDirectories(path));
+        var files = new List<string>(Directory.GetFiles(path));
         directories.Sort();
         files.Sort();
         await writer.WriteAsync($"{directories.Count + files.Count} ");
