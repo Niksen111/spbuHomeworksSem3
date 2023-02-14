@@ -12,7 +12,7 @@ public class MyThreadPool
     private CancellationTokenSource source = new();
     private bool isShutdown;
     private AutoResetEvent tasksOver;
-    private AutoResetEvent taskAdded;
+    private Semaphore taskCount = new Semaphore(0, 10000);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MyThreadPool"/> class.
@@ -29,11 +29,10 @@ public class MyThreadPool
         this.tasks = new();
         this.threads = new MyThread[threadCount];
         this.tasksOver = new AutoResetEvent(false);
-        this.taskAdded = new AutoResetEvent(false);
 
         for (int i = 0; i < threadCount; ++i)
         {
-            this.threads[i] = new MyThread(this.tasks, this.source.Token, this.tasksOver, this.taskAdded);
+            this.threads[i] = new MyThread(this.tasks, this.source.Token, this.tasksOver, this.taskCount);
         }
 
         this.isShutdown = false;
@@ -54,7 +53,8 @@ public class MyThreadPool
     {
         var task = new MyTask<TResult>(func, this);
         this.tasks.Add(() => task.Start());
-        this.taskAdded.Set();
+        this.tasksOver.Reset();
+        this.taskCount.Release();
         return task;
     }
 
@@ -87,7 +87,7 @@ public class MyThreadPool
 
         for (int i = 0; i < this.ThreadCount; i++)
         {
-            this.taskAdded.Set();
+            this.taskCount.Release();
         }
 
         var areJoined = true;
@@ -113,13 +113,13 @@ public class MyThreadPool
         private BlockingCollection<Action> collection;
         private int timeout = 5000;
         private AutoResetEvent tasksOver;
-        private AutoResetEvent taskAdded;
+        private Semaphore tasksCount;
 
-        public MyThread(BlockingCollection<Action> collection, CancellationToken token, AutoResetEvent tasksOver, AutoResetEvent taskAdded)
+        public MyThread(BlockingCollection<Action> collection, CancellationToken token, AutoResetEvent tasksOver, Semaphore tasksCount)
         {
             this.tasksOver = tasksOver;
             this.collection = collection;
-            this.taskAdded = taskAdded;
+            this.tasksCount = tasksCount;
             this.thread = new Thread(() => this.Start(token));
             this.IsWorking = false;
             this.thread.Start();
@@ -148,7 +148,7 @@ public class MyThreadPool
                 else
                 {
                     this.tasksOver.Set();
-                    this.taskAdded.WaitOne();
+                    this.tasksCount.WaitOne();
                 }
             }
         }
