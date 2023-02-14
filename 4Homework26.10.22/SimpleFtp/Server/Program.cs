@@ -5,9 +5,9 @@
 
 var source = new CancellationTokenSource();
 
-var server = new Server.Server(source.Token);
+var server = new Server.Server();
 
-var serverState = Task.Run(() => server.Start(port));
+var serverState = Task.Run(() => server.Start(source.Token, port));
 Console.WriteLine("Press Enter to stop the server.");
 while (true)
 {

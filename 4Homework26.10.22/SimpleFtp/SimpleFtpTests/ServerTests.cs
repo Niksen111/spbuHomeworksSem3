@@ -18,8 +18,8 @@ public class ServerTests
     public void OneTimeSetUp()
     {
         this.source = new CancellationTokenSource();
-        this.server = new Server.Server(this.source.Token);
-        this.serverState = Task.Run(() => this.server.Start(this.port), this.source.Token);
+        this.server = new Server.Server();
+        this.serverState = Task.Run(() => this.server.Start(this.source.Token, this.port), this.source.Token);
     }
 
     [OneTimeTearDown]
@@ -64,6 +64,7 @@ public class ServerTests
     [Test]
     public void ServerWorksWithSeveralClients()
     {
+        Assert.IsTrue(this.server!.IsWorking);
         using var client1 = new TcpClient();
         client1.Connect("127.0.0.1", this.port);
         using var stream1 = client1.GetStream();
@@ -101,6 +102,7 @@ public class ServerTests
         writer2.Flush();
         response = reader2.ReadLine();
         Assert.AreEqual("1 ../net6.0 true ", response);
+        Assert.IsTrue(this.server!.IsWorking);
     }
 
     [Test]

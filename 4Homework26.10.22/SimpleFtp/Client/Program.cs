@@ -1,6 +1,4 @@
-﻿using System.Net.Sockets;
-
-if (args.Length != 2)
+﻿if (args.Length != 2)
 {
     throw new InvalidDataException();
 }
@@ -10,10 +8,7 @@ if (!int.TryParse(args[1], out int port) || port < 0 || port > 65535)
     throw new InvalidDataException();
 }
 
-using var tcpClient = new TcpClient();
-await tcpClient.ConnectAsync(args[0], port);
-await using var stream = tcpClient.GetStream();
-var client = new Client.Client();
+var client = new Client.Client(args[0], port);
 
 Console.WriteLine("Type \"help\" to see a list of commands");
 
@@ -47,30 +42,27 @@ while (true)
                 throw new InvalidDataException();
             }
 
-            Console.WriteLine(await client.ListAsync(stream, request[1]));
+            var contents = await client.ListAsync(request[1]);
+            var result = contents.Count + " ";
+            foreach (var content in contents)
+            {
+                result += content.ToString();
+            }
+
+            Console.WriteLine(result);
             break;
         }
 
         case "2":
-        {
-            if (request.Length != 2)
-            {
-                throw new InvalidDataException();
-            }
-
-            var response = await client.GetAsync(stream, request[1]);
-            Console.WriteLine(response);
-            break;
-        }
-
-        case "3":
         {
             if (request.Length != 3)
             {
                 throw new InvalidDataException();
             }
 
-            await client.DownloadAsync(stream, request[1], request[2]);
+            var fileStream = File.OpenRead(request[2]);
+            await client.GetAsync(request[1], fileStream);
+            fileStream.Close();
             Console.WriteLine("Success.");
             break;
         }
@@ -97,8 +89,7 @@ static class PrintFunctions
         Console.WriteLine();
         Console.WriteLine("Commands:");
         Console.WriteLine(" 1 <path>   listing of files in the directory on the server");
-        Console.WriteLine(" 2 <path>   read file from the server");
-        Console.WriteLine(" 3 <path> <path to the new file> download file from the server");
+        Console.WriteLine(" 2 <path> <path to the new file> download file from the server");
         Console.WriteLine();
         Console.WriteLine("q  -  quit");
     }

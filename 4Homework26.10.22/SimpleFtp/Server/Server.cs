@@ -17,20 +17,33 @@ public class Server
     /// <summary>
     /// Initializes a new instance of the <see cref="Server"/> class.
     /// </summary>
-    /// <param name="token">Token to stop listening.</param>
-    public Server(CancellationToken token)
+    public Server()
     {
-        this.token = token;
         this.sessions = new List<Task>();
+        this.IsWorking = false;
+        this.token = CancellationToken.None;
     }
+
+    /// <summary>
+    /// Gets a value indicating whether server is stopped.
+    /// </summary>
+    public bool IsWorking { get; private set; }
 
     /// <summary>
     /// Start server.
     /// </summary>
+    /// <param name="newToken">Token to stop listening.</param>
     /// <param name="port">The port on which to listen for incoming connection attempts.</param>
     /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-    public async Task Start(int port = 11111)
+    public async Task Start(CancellationToken newToken, int port = 11111)
     {
+        if (this.IsWorking)
+        {
+            throw new InvalidOperationException("Server is already working.");
+        }
+
+        this.IsWorking = true;
+        this.token = newToken;
         var listener = new TcpListener(IPAddress.Any, port);
         listener.Start();
 
@@ -51,6 +64,9 @@ public class Server
         {
             await session;
         }
+
+        this.sessions = new List<Task>();
+        this.IsWorking = false;
     }
 
     private async Task Session(Socket socket, CancellationToken cancellation)
