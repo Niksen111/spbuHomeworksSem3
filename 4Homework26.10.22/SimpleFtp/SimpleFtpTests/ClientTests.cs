@@ -64,15 +64,15 @@ public class ClientTests
         Assert.AreEqual("1 ../../Debug true ", result1);
         Assert.AreEqual(this.simpleFtpTestsListing, result2);
         Assert.AreEqual(
-            "4 ../../../TestingFiles/ABCD.axax false ../../../TestingFiles/ABCD1.axax false ../../../TestingFiles/kek.txt false ../../../TestingFiles/kek1.txt false ",
+            $"4 ../../../TestingFiles{Path.DirectorySeparatorChar}ABCD.axax false ../../../TestingFiles{Path.DirectorySeparatorChar}ABCD1.axax false ../../../TestingFiles{Path.DirectorySeparatorChar}kek.txt false ../../../TestingFiles{Path.DirectorySeparatorChar}kek1.txt false ",
             result3);
     }
 
     [Test]
     public async Task DownloadsFile()
     {
-        await using var out1 = File.OpenWrite("../../../TestingFiles/kek1.txt");
-        await using var out2 = File.OpenWrite("../../../TestingFiles/ABCD1.axax");
+        await using var out1 = File.OpenWrite($"../../../TestingFiles{Path.DirectorySeparatorChar}kek1.txt");
+        await using var out2 = File.OpenWrite($"../../../TestingFiles{Path.DirectorySeparatorChar}ABCD1.axax");
 
         await this.client!.GetAsync($"../../../TestingFiles{Path.DirectorySeparatorChar}kek.txt", out1);
         await this.client!.GetAsync($"../../../TestingFiles{Path.DirectorySeparatorChar}ABCD.axax", out2);
