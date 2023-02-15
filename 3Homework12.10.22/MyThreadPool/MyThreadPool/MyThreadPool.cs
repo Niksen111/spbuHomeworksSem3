@@ -161,6 +161,7 @@ public class MyThreadPool
         private ManualResetEvent resetEvent = new(false);
         private T? result;
         private Exception? returnedException;
+        private BlockingCollection<Action> deferredTasks;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MyTask{T}"/> class.
@@ -172,6 +173,7 @@ public class MyThreadPool
             this.func = func;
             this.pool = threadPool;
             this.IsCompleted = false;
+            this.deferredTasks = new BlockingCollection<Action>();
         }
 
         /// <inheritdoc/>
@@ -207,21 +209,32 @@ public class MyThreadPool
                 this.func = null;
                 this.IsCompleted = true;
                 this.resetEvent.Set();
+                this.deferredTasks.CompleteAdding();
+                foreach (var task in this.deferredTasks)
+                {
+                    this.pool.Submit(() => task);
+                }
             }
         }
 
         /// <inheritdoc/>
         public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<T, TNewResult> func1)
         {
-            TNewResult NewFunc()
+            if (this.result != null)
             {
-                T realResult = this.Result;
-                return this.pool.Submit(() => func1(realResult)).Result;
+                return this.pool.Submit(() => func1(this.Result));
             }
 
-            var newTask = new MyTask<TNewResult>(NewFunc, this.pool);
-            var thread = new Thread(() => newTask.Start());
-            thread.Start();
+            MyTask<TNewResult> newTask = new MyTask<TNewResult>(() => func1(this.Result), this.pool);
+            try
+            {
+                this.deferredTasks.Add(() => newTask.Start());
+            }
+            catch (InvalidOperationException)
+            {
+                return this.pool.Submit(() => func1(this.Result));
+            }
+
             return newTask;
         }
     }
