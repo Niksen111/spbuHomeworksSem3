@@ -20,7 +20,8 @@ public class TestAttribute : Attribute
     
     public TestAttribute(Type? expectedException, string? ignore)
     {
-        
+        this.Expected = expectedException;
+        this.Ignore = ignore;
     }
     
     public Type? Expected { get; set; }
