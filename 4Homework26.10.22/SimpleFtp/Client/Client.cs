@@ -46,7 +46,7 @@ public class Client
     /// <exception cref="InvalidOperationException">The Client is not connected to a remote host.</exception>
     /// <exception cref="DirectoryNotFoundException">The directory with the specified path was not found on the server.</exception>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public async Task<List<DirectoryContent>> ListAsync(string path)
+    public async Task<List<Record>> ListAsync(string path)
     {
         var tcpClient = new TcpClient();
         await tcpClient.ConnectAsync(this.Host, this.Port);
@@ -68,10 +68,10 @@ public class Client
         }
 
         var line1 = line.Split();
-        var contents = new List<DirectoryContent>();
+        var contents = new List<Record>();
         for (int i = 1; i < line1.Length - 1; i += 2)
         {
-            contents.Add(new DirectoryContent(line1[i], line1[i + 1] == "true"));
+            contents.Add(new Record(line1[i], line1[i + 1] == "true"));
         }
 
         return contents;
@@ -140,26 +140,26 @@ public class Client
     /// <summary>
     /// Abstraction of directory contents (files or directories).
     /// </summary>
-    public struct DirectoryContent
+    public struct Record
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DirectoryContent"/> struct.
+        /// Initializes a new instance of the <see cref="Record"/> struct.
         /// </summary>
-        /// <param name="name">Content name.</param>
-        /// <param name="isDirectory">A value indicating whether the content is a directory.</param>
-        public DirectoryContent(string name, bool isDirectory)
+        /// <param name="name">Record name.</param>
+        /// <param name="isDirectory">A value indicating whether the record is a directory.</param>
+        public Record(string name, bool isDirectory)
         {
             this.Name = name;
             this.IsDirectory = isDirectory;
         }
 
         /// <summary>
-        /// Gets content name.
+        /// Gets record name.
         /// </summary>
         public string Name { get; }
 
         /// <summary>
-        /// Gets a value indicating whether gets true if the content is directory.
+        /// Gets a value indicating whether gets true if the record is directory.
         /// </summary>
         public bool IsDirectory { get; }
 

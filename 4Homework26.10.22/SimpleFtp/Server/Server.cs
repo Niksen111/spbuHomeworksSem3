@@ -71,7 +71,7 @@ public class Server
 
     private async Task Session(Socket socket, CancellationToken cancellation)
     {
-        try
+        using (socket)
         {
             await using var stream = new NetworkStream(socket);
             using var listener = new StreamReader(stream);
@@ -121,10 +121,6 @@ public class Server
                 }
             }
         }
-        finally
-        {
-            socket.Close();
-        }
     }
 
     private async Task ListAsync(string path, StreamWriter writer)
@@ -168,8 +164,8 @@ public class Server
         var length = fileInfo.Length;
         var lengthBytes = BitConverter.GetBytes(length);
         await stream.WriteAsync(lengthBytes);
-        var x = Encoding.UTF8.GetBytes(" ");
-        await stream.WriteAsync(x);
+        var spaceByte = Encoding.UTF8.GetBytes(" ");
+        await stream.WriteAsync(spaceByte);
         await using var reader = new FileStream(path, FileMode.Open);
 
         var leftToWrite = length;
