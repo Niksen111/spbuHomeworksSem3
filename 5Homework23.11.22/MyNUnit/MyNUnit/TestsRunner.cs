@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace MyNUnit;
 
@@ -85,24 +85,49 @@ public class TestsRunner
 
     private async Task<ClassTestsInfo?> ClassRun(Type testClass)
     {
-        var classesInfo = new ClassTestsInfo(testClass.FullName);
+        var classInfo = new ClassTestsInfo(testClass.FullName);
         var methods = testClass.GetMethods();
         var beforeClass = new List<MethodInfo>();
         var afterClass = new List<MethodInfo>();
         var before = new List<MethodInfo>();
         var after = new List<MethodInfo>();
         var testMethods = new List<MethodInfo>();
+        var constructors = new List<MethodInfo>();
         foreach (var method in methods)
         {
             foreach (var attribute in Attribute.GetCustomAttributes(method))
             {
                 if (attribute.GetType() == typeof(Attributes.BeforeClassAttribute))
                 {
-                    beforeClass.Add(method);
+                    if (method.IsStatic)
+                    {
+                        beforeClass.Add(method);
+                    }
+                    else
+                    {
+                        if (classInfo.Comments == null)
+                        {
+                            classInfo.Comments = string.Empty;
+                        }
+
+                        classInfo.Comments += "ERROR: Founded non-static class with BeforeClassAttribute.\n";
+                    }
                 }
                 else if (attribute.GetType() == typeof(Attributes.AfterClassAttribute))
                 {
-                    afterClass.Add(method);
+                    if (method.IsStatic)
+                    {
+                        afterClass.Add(method);
+                    }
+                    else
+                    {
+                        if (classInfo.Comments == null)
+                        {
+                            classInfo.Comments = string.Empty;
+                        }
+
+                        classInfo.Comments += "ERROR: Founded non-static class with AfterClassAttribute.\n";
+                    }
                 }
                 else if (attribute.GetType() == typeof(Attributes.BeforeAttribute))
                 {
@@ -114,12 +139,76 @@ public class TestsRunner
                 }
                 else if (attribute.GetType() == typeof(Attributes.TestAttribute))
                 {
-                    testMethods.Add(method);
+                    if (((Attributes.TestAttribute)attribute).Ignore != null)
+                    {
+                        var reasonForIgnoring = ((Attributes.TestAttribute)attribute).Ignore;
+                        var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
+                        classInfo.TestsInfo.Add(localInfo);
+                    }
+                    else
+                    {
+                        testMethods.Add(method);
+                    }
+                }
+                else if (method.IsConstructor)
+                {
+                    constructors.Add(method);
                 }
             }
         }
 
-        return classesInfo;
+        foreach (var method in beforeClass)
+        {
+            method.Invoke(null, null);
+        }
+
+        var testInvoking = new Func<object?, MethodInfo, TestInfo>((instance, m) =>
+        {
+            foreach (var method in before)
+            {
+                method.Invoke(instance, null);
+            }
+
+            var stopwatch = new Stopwatch();
+            Exception? exception = null;
+            stopwatch.Start();
+            try
+            {
+                m.Invoke(instance, null);
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+
+            stopwatch.Stop();
+
+            foreach (var method in after)
+            {
+                method.Invoke(instance, null);
+            }
+
+            return new TestInfo(m.Name, exception == null, stopwatch.ElapsedMilliseconds, exception);
+        });
+
+        var tests = new List<Task<TestInfo>>();
+        foreach (var testMethod in testMethods)
+        {
+            var instance = Activator.CreateInstance(testClass);
+            tests.Add(Task.Run(() => testInvoking(instance, testMethod)));
+        }
+
+        foreach (var test in tests)
+        {
+            classInfo.TestsInfo.Add(await test);
+        }
+
+        foreach (var method in afterClass)
+        {
+            method.Invoke(null, null);
+        }
+
+        return classInfo;
     }
 
     /// <summary>
@@ -142,6 +231,11 @@ public class TestsRunner
         /// Gets ClassesInfo collection.
         /// </summary>
         public BlockingCollection<ClassTestsInfo> ClassesInfo { get; }
+
+        /// <summary>
+        /// Gets or sets comments on the testing of this assembly.
+        /// </summary>
+        public string? Comments { get; set; }
     }
 
     /// <summary>
@@ -164,6 +258,11 @@ public class TestsRunner
         /// Gets a collection of TestInfo of this class.
         /// </summary>
         public BlockingCollection<TestInfo> TestsInfo { get; }
+
+        /// <summary>
+        /// Gets or sets comments on the testing of this class.
+        /// </summary>
+        public string? Comments { get; set; }
     }
 
     /// <summary>
@@ -171,7 +270,7 @@ public class TestsRunner
     /// </summary>
     public class TestInfo
     {
-        public TestInfo(string methodName, bool isSuccess, int runningTime, Exception? exception = null, string? reasonForIgnoring = null)
+        public TestInfo(string methodName, bool isSuccess, long runningTime, Exception? exception = null, string? reasonForIgnoring = null)
         {
             this.MethodName = methodName;
             this.IsSuccess = isSuccess;
@@ -193,7 +292,7 @@ public class TestsRunner
         /// <summary>
         /// Gets the running time of the test.
         /// </summary>
-        public int RunningTime { get; }
+        public long RunningTime { get; }
 
         /// <summary>
         /// Gets an exception was thrown by the test.
