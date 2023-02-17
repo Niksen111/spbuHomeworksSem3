@@ -1,9 +1,9 @@
-using System.Diagnostics;
-
 namespace MyNUnit;
 
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
+using MyNUnit.Attributes;
 
 /// <summary>
 /// Class for running and checking tests.
@@ -91,13 +91,12 @@ public class TestsRunner
         var afterClass = new List<MethodInfo>();
         var before = new List<MethodInfo>();
         var after = new List<MethodInfo>();
-        var testMethods = new List<MethodInfo>();
-        var constructors = new List<MethodInfo>();
+        var testMethods = new List<(MethodInfo Method, Type? Expected)>();
         foreach (var method in methods)
         {
             foreach (var attribute in Attribute.GetCustomAttributes(method))
             {
-                if (attribute.GetType() == typeof(Attributes.BeforeClassAttribute))
+                if (attribute.GetType() == typeof(BeforeClassAttribute))
                 {
                     if (method.IsStatic)
                     {
@@ -113,7 +112,7 @@ public class TestsRunner
                         classInfo.Comments += "ERROR: Founded non-static class with BeforeClassAttribute.\n";
                     }
                 }
-                else if (attribute.GetType() == typeof(Attributes.AfterClassAttribute))
+                else if (attribute.GetType() == typeof(AfterClassAttribute))
                 {
                     if (method.IsStatic)
                     {
@@ -129,17 +128,17 @@ public class TestsRunner
                         classInfo.Comments += "ERROR: Founded non-static class with AfterClassAttribute.\n";
                     }
                 }
-                else if (attribute.GetType() == typeof(Attributes.BeforeAttribute))
+                else if (attribute.GetType() == typeof(BeforeAttribute))
                 {
                     before.Add(method);
                 }
-                else if (attribute.GetType() == typeof(Attributes.AfterAttribute))
+                else if (attribute.GetType() == typeof(AfterAttribute))
                 {
                     after.Add(method);
                 }
-                else if (attribute.GetType() == typeof(Attributes.TestAttribute))
+                else if (attribute.GetType() == typeof(TestAttribute))
                 {
-                    if (((Attributes.TestAttribute)attribute).Ignore != null)
+                    if (((TestAttribute)attribute).Ignore != null)
                     {
                         var reasonForIgnoring = ((Attributes.TestAttribute)attribute).Ignore;
                         var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
@@ -147,12 +146,8 @@ public class TestsRunner
                     }
                     else
                     {
-                        testMethods.Add(method);
+                        testMethods.Add((method, ((TestAttribute)attribute!).Expected));
                     }
-                }
-                else if (method.IsConstructor)
-                {
-                    constructors.Add(method);
                 }
             }
         }
@@ -162,7 +157,7 @@ public class TestsRunner
             method.Invoke(null, null);
         }
 
-        var testInvoking = new Func<object?, MethodInfo, TestInfo>((instance, m) =>
+        var testInvoking = new Func<object?, MethodInfo, Type?, TestInfo>((instance, m, expected) =>
         {
             foreach (var method in before)
             {
@@ -178,7 +173,10 @@ public class TestsRunner
             }
             catch (Exception e)
             {
-                exception = e;
+                if (expected == null || !e.GetType().IsAssignableTo(expected))
+                {
+                    exception = e;
+                }
             }
 
             stopwatch.Stop();
@@ -195,7 +193,7 @@ public class TestsRunner
         foreach (var testMethod in testMethods)
         {
             var instance = Activator.CreateInstance(testClass);
-            tests.Add(Task.Run(() => testInvoking(instance, testMethod)));
+            tests.Add(Task.Run(() => testInvoking(instance, testMethod.Method, testMethod.Expected)));
         }
 
         foreach (var test in tests)
@@ -216,6 +214,10 @@ public class TestsRunner
     /// </summary>
     public class AssemblyTestsInfo
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyTestsInfo"/> class.
+        /// </summary>
+        /// <param name="assemblyPath">Path to the assembly.</param>
         public AssemblyTestsInfo(string assemblyPath)
         {
             this.AssemblyPath = assemblyPath;
@@ -243,6 +245,10 @@ public class TestsRunner
     /// </summary>
     public class ClassTestsInfo
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassTestsInfo"/> class.
+        /// </summary>
+        /// <param name="className">Name of the tested class.</param>
         public ClassTestsInfo(string? className)
         {
             this.ClassName = className;
