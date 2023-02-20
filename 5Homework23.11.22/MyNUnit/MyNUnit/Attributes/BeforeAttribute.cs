@@ -5,6 +5,5 @@ public class BeforeAttribute : Attribute
 {
     public BeforeAttribute()
     {
-        
     }
 }

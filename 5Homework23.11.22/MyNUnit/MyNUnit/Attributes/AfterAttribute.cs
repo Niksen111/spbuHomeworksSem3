@@ -5,6 +5,5 @@ public class AfterAttribute : Attribute
 {
     public AfterAttribute()
     {
-        
     }
 }

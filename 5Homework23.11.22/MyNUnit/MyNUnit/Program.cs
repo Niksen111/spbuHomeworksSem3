@@ -7,12 +7,6 @@ if (args.Length != 1)
 }
 
 var tokenSource = new CancellationTokenSource();
-var testsRunner = new TestsRunner();
-var info = await testsRunner.RunTests(args[0], tokenSource.Token);
-if (info == null)
-{
-    Console.WriteLine("This directory is not contains a tests.");
-    return;
-}
+var info = await TestsRunner.RunTests(args[0], tokenSource.Token);
 
-Console.WriteLine(info.ToString());
+TestsRunner.GenerateReport(info, Console.Out);
