@@ -38,6 +38,17 @@ public static class TestsRunner
             foreach (var classInfo in assemblyInfo.ClassesInfo)
             {
                 await writer.WriteLineAsync($"  Class: {classInfo.ClassName}");
+                foreach (var comment in classInfo.Comments)
+                {
+                    await writer.WriteLineAsync(comment);
+                }
+
+                if (classInfo.Exception != null)
+                {
+                    await writer.WriteLineAsync($"{classInfo.Exception}");
+                    continue;
+                }
+
                 await writer.WriteLineAsync($"Successful tests: {classInfo.SuccessfulTestsCount}");
                 await writer.WriteLineAsync($"Failed tests: {classInfo.FailedTestsCount}");
                 await writer.WriteLineAsync();
@@ -61,7 +72,7 @@ public static class TestsRunner
                     {
                         await writer.WriteLineAsync("Test status: Failed");
                         await writer.WriteLineAsync(testInfo.Comment);
-                        await writer.WriteLineAsync(testInfo.Exception!.InnerException!.GetType().ToString());
+                        await writer.WriteLineAsync($"{testInfo.Exception}");
                     }
 
                     await writer.WriteLineAsync();
