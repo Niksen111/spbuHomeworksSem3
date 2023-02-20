@@ -3,6 +3,7 @@ namespace MyNUnit;
 using System.Diagnostics;
 using System.Reflection;
 using MyNUnit.Attributes;
+using MyNUnit.Info;
 
 /// <summary>
 /// Class for running and checking tests.
@@ -14,7 +15,7 @@ public static class TestsRunner
     /// </summary>
     /// <param name="info">The result from the TestsRunner tests running.</param>
     /// <param name="writer">Report output.</param>
-    public static void GenerateReport(SummaryInfo info, TextWriter writer)
+    public static async Task GenerateReport(SummaryInfo info, TextWriter writer)
     {
         if (info.Comment != null)
         {
@@ -24,16 +25,47 @@ public static class TestsRunner
 
         foreach (var assemblyInfo in info.AssembliesInfo)
         {
-            writer.WriteLine(assemblyInfo.AssemblyPath);
+            await writer.WriteAsync("    ");
+            await writer.WriteLineAsync(assemblyInfo.AssemblyPath);
             if (assemblyInfo.Comment != null)
             {
-                writer.WriteLine(assemblyInfo.Comment);
+                await writer.WriteLineAsync(assemblyInfo.Comment);
+                await writer.WriteLineAsync();
                 continue;
             }
 
+            await writer.WriteLineAsync();
             foreach (var classInfo in assemblyInfo.ClassesInfo)
             {
-                
+                await writer.WriteLineAsync($"  Class: {classInfo.ClassName}");
+                await writer.WriteLineAsync($"Successful tests: {classInfo.SuccessfulTestsCount}");
+                await writer.WriteLineAsync($"Failed tests: {classInfo.FailedTestsCount}");
+                await writer.WriteLineAsync();
+
+                foreach (var testInfo in classInfo.TestsInfo)
+                {
+                    await writer.WriteLineAsync(testInfo.MethodName);
+                    if (testInfo.ReasonForIgnoring != null)
+                    {
+                        await writer.WriteLineAsync("Test ignored.");
+                        await writer.WriteLineAsync(testInfo.ReasonForIgnoring);
+                        continue;
+                    }
+
+                    if (testInfo.IsSuccess)
+                    {
+                        await writer.WriteLineAsync("Test status: Success");
+                        await writer.WriteLineAsync($"Running time: {testInfo.RunningTime}");
+                    }
+                    else
+                    {
+                        await writer.WriteLineAsync("Test status: Failed");
+                        await writer.WriteLineAsync(testInfo.Comment);
+                        await writer.WriteLineAsync(testInfo.Exception!.InnerException!.GetType().ToString());
+                    }
+
+                    await writer.WriteLineAsync();
+                }
             }
         }
     }
@@ -175,9 +207,23 @@ public static class TestsRunner
             }
         }
 
+        if (testMethods.Count == 0)
+        {
+            return null;
+        }
+
         foreach (var method in beforeClass)
         {
-            method.Invoke(null, null);
+            try
+            {
+                method.Invoke(null, null);
+            }
+            catch (Exception e)
+            {
+                classInfo.Exception = e;
+                classInfo.Comments.Add($"ERROR: failed to run the {method.Name} method.");
+                return classInfo;
+            }
         }
 
         var tests = new List<Task<TestInfo>>();
@@ -194,10 +240,19 @@ public static class TestsRunner
 
         foreach (var method in afterClass)
         {
-            method.Invoke(null, null);
+            try
+            {
+                method.Invoke(null, null);
+            }
+            catch (Exception e)
+            {
+                classInfo.Exception = e;
+                classInfo.Comments.Add($"ERROR: failed to run the {method.Name} method.");
+                return classInfo;
+            }
         }
 
-        return classInfo.TestsInfo.Count == 0 ? null : classInfo;
+        return classInfo;
     }
 
     private static TestInfo TestRun(object? instance, MethodInfo methodInfo, Type? exceptedException, List<MethodInfo> before, List<MethodInfo> after)
@@ -248,157 +303,5 @@ public static class TestsRunner
         }
 
         return new TestInfo(methodInfo.Name, true, stopwatch.ElapsedMilliseconds);
-    }
-
-    public class SummaryInfo
-    {
-        public SummaryInfo()
-        {
-            this.AssembliesInfo = new List<AssemblyTestsInfo>();
-        }
-
-        /// <summary>
-        /// Gets AssemblyTestsInfo collection.
-        /// </summary>
-        public List<AssemblyTestsInfo> AssembliesInfo;
-
-        /// <summary>
-        /// Gets or sets comment on the testing of all assemblies.
-        /// </summary>
-        public string? Comment;
-    }
-
-    /// <summary>
-    /// Information about the work of the class tests of this assembly.
-    /// </summary>
-    public class AssemblyTestsInfo
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyTestsInfo"/> class.
-        /// </summary>
-        /// <param name="assemblyPath">Path to the assembly.</param>
-        public AssemblyTestsInfo(string assemblyPath)
-        {
-            this.AssemblyPath = assemblyPath;
-            this.ClassesInfo = new List<ClassTestsInfo>();
-        }
-
-        /// <summary>
-        /// Gets Assembly path.
-        /// </summary>
-        public string AssemblyPath { get; }
-
-        /// <summary>
-        /// Gets ClassesInfo collection.
-        /// </summary>
-        public List<ClassTestsInfo> ClassesInfo { get; }
-
-        /// <summary>
-        /// Gets or sets comment on the testing of this assembly.
-        /// </summary>
-        public string? Comment { get; set; }
-    }
-
-    /// <summary>
-    /// Information about the work of the tests of this class.
-    /// </summary>
-    public class ClassTestsInfo
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ClassTestsInfo"/> class.
-        /// </summary>
-        /// <param name="className">Name of the tested class.</param>
-        public ClassTestsInfo(string? className)
-        {
-            this.ClassName = className;
-            this.TestsInfo = new List<TestInfo>();
-            this.Comments = new List<string>();
-        }
-
-        /// <summary>
-        /// Gets the name of the tested class.
-        /// </summary>
-        public string? ClassName { get; }
-
-        /// <summary>
-        /// Gets a collection of TestInfo of this class.
-        /// </summary>
-        public List<TestInfo> TestsInfo { get; }
-
-        /// <summary>
-        /// Gets or sets comments on the testing of this class.
-        /// </summary>
-        public List<string> Comments { get; }
-
-        /// <summary>
-        /// Gets successful tests count.
-        /// </summary>
-        public int SuccessfulTestsCount
-        {
-            get
-            {
-                var cnt = 0;
-                foreach (var test in this.TestsInfo)
-                {
-                    if (test.IsSuccess)
-                    {
-                        ++cnt;
-                    }
-                }
-
-                return cnt;
-            }
-        }
-
-        /// <summary>
-        /// Gets failed tests count.
-        /// </summary>
-        public int FailedTestsCount => this.TestsInfo.Count - this.SuccessfulTestsCount;
-    }
-
-    /// <summary>
-    /// Information about the work of the test.
-    /// </summary>
-    public class TestInfo
-    {
-        public TestInfo(string methodName, bool isSuccess, long runningTime, Exception? exception = null, string? reasonForIgnoring = null, string? comment = null)
-        {
-            this.MethodName = methodName;
-            this.IsSuccess = isSuccess;
-            this.RunningTime = runningTime;
-            this.Exception = exception;
-            this.ReasonForIgnoring = reasonForIgnoring;
-            this.Comment = comment;
-        }
-
-        /// <summary>
-        /// Gets the name of the tested method.
-        /// </summary>
-        public string MethodName { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the test was completed successfully.
-        /// </summary>
-        public bool IsSuccess { get; }
-
-        /// <summary>
-        /// Gets the running time of the test.
-        /// </summary>
-        public long RunningTime { get; }
-
-        /// <summary>
-        /// Gets an exception was thrown by the test.
-        /// </summary>
-        public Exception? Exception { get; }
-
-        /// <summary>
-        /// Gets the reason for ignoring this test.
-        /// </summary>
-        public string? ReasonForIgnoring { get; }
-
-        /// <summary>
-        /// Gets comment on the running of this method.
-        /// </summary>
-        public string? Comment { get; }
     }
 }
