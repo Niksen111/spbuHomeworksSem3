@@ -1,6 +1,5 @@
 namespace MyNUnit.Info;
 
-
 /// <summary>
 /// Information about the work of the test.
 /// </summary>

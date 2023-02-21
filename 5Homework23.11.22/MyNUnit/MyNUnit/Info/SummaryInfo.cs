@@ -1,15 +1,10 @@
 namespace MyNUnit.Info;
 
 /// <summary>
-/// 
+/// Information about running of the tests.
 /// </summary>
 public class SummaryInfo
 {
-    public SummaryInfo()
-    {
-        this.AssembliesInfo = new List<AssemblyTestsInfo>();
-    }
-
     /// <summary>
     /// Gets AssemblyTestsInfo collection.
     /// </summary>
@@ -19,4 +14,12 @@ public class SummaryInfo
     /// Gets or sets comment on the testing of all assemblies.
     /// </summary>
     public string? Comment;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SummaryInfo"/> class.
+    /// </summary>
+    public SummaryInfo()
+    {
+        this.AssembliesInfo = new List<AssemblyTestsInfo>();
+    }
 }

@@ -89,7 +89,7 @@ public static class TestsRunner
     /// <param name="token">Token that sends a notification that operations should be canceled.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.
     /// If there are no test methods along this path, it returns null.</returns>
-    public static async Task<SummaryInfo> RunTests(string pathToAssemblies, CancellationToken token)
+    public static async Task<SummaryInfo> RunTests(string pathToAssemblies, CancellationToken token = default(CancellationToken))
     {
         var summaryInfo = new SummaryInfo();
 
@@ -104,11 +104,17 @@ public static class TestsRunner
             }
         }
 
+        if (!Directory.Exists(pathToAssemblies))
+        {
+            summaryInfo.Comment = "Directory is not exist.";
+            return summaryInfo;
+        }
+        
         var testsAssemblies = Directory.EnumerateFiles(pathToAssemblies, "*.dll");
         var assemblies = new List<Task<AssemblyTestsInfo>>();
-        foreach (var assembly in testsAssemblies)
+        foreach (var file in testsAssemblies)
         {
-            assemblies.Add(Task.Run(() => AssemblyRun(Assembly.Load(assembly)), token));
+            assemblies.Add(Task.Run(() => AssemblyRun(Assembly.LoadFrom(file)), token));
         }
 
         foreach (var assembly in assemblies)
@@ -241,7 +247,7 @@ public static class TestsRunner
         var tests = new List<Task<TestInfo>>();
         foreach (var testMethod in testMethods)
         {
-            var instance = Activator.CreateInstance(testClass);
+            var instance = testClass.IsAbstract && testClass.IsSealed ? null : Activator.CreateInstance(testClass);
             tests.Add(Task.Run(() => TestRun(instance, testMethod.Method, testMethod.Expected, before, after)));
         }
 

@@ -27,14 +27,14 @@ public class ClassTestsInfo
     public List<TestInfo> TestsInfo { get; }
 
     /// <summary>
-    /// Gets or sets comments on the testing of this class.
+    /// Gets comments on the testing of this class.
     /// </summary>
     public List<string> Comments { get; }
 
     /// <summary>
-    /// Gets an exception was thrown by the before/after class methods.
+    /// Gets or sets an exception was thrown by the before/after class methods.
     /// </summary>
-    public Exception? Exception;
+    public Exception? Exception { get; set; }
 
     /// <summary>
     /// Gets the cumulative running time of all the tests passed in that class.
@@ -44,7 +44,7 @@ public class ClassTestsInfo
         get
         {
             long counter = 0;
-            foreach (var test in TestsInfo)
+            foreach (var test in this.TestsInfo)
             {
                 counter += test.RunningTime;
             }
