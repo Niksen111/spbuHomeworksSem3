@@ -37,6 +37,23 @@ public class ClassTestsInfo
     public Exception? Exception;
 
     /// <summary>
+    /// Gets the cumulative running time of all the tests passed in that class.
+    /// </summary>
+    public long RunningTime
+    {
+        get
+        {
+            long counter = 0;
+            foreach (var test in TestsInfo)
+            {
+                counter += test.RunningTime;
+            }
+
+            return counter;
+        }
+    }
+
+    /// <summary>
     /// Gets successful tests count.
     /// </summary>
     public int SuccessfulTestsCount

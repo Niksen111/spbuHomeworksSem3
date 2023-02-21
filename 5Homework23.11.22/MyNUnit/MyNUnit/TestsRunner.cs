@@ -15,6 +15,7 @@ public static class TestsRunner
     /// </summary>
     /// <param name="info">The result from the TestsRunner tests running.</param>
     /// <param name="writer">Report output.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public static async Task GenerateReport(SummaryInfo info, TextWriter writer)
     {
         if (info.Comment != null)
@@ -206,7 +207,7 @@ public static class TestsRunner
                 {
                     if (((TestAttribute)attribute).Ignore != null)
                     {
-                        var reasonForIgnoring = ((Attributes.TestAttribute)attribute).Ignore;
+                        var reasonForIgnoring = ((TestAttribute)attribute).Ignore;
                         var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
                         classInfo.TestsInfo.Add(localInfo);
                     }
