@@ -1,0 +1,15 @@
+{
+  "class-name": "TestProject.Class3",
+  "tests-info": [
+    {
+      "method-name": "PassingTest",
+      "is-success": true,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": null
+    }
+  ],
+  "comments": [
+    "ERROR: failed to run the FailedAfterClass method."
+  ]
+}

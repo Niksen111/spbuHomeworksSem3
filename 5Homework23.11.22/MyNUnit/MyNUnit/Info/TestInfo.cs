@@ -1,5 +1,7 @@
 namespace MyNUnit.Info;
 
+using System.Text.Json.Serialization;
+
 /// <summary>
 /// Information about the work of the test.
 /// </summary>
@@ -16,32 +18,38 @@ public class TestInfo
     }
 
     /// <summary>
-    /// Gets the name of the tested method.
+    /// Gets or sets the name of the tested method.
     /// </summary>
-    public string MethodName { get; }
+    [JsonPropertyName("method-name")]
+    public string MethodName { get; set; }
 
     /// <summary>
-    /// Gets a value indicating whether the test was completed successfully.
+    /// Gets or sets a value indicating whether the test was completed successfully.
     /// </summary>
-    public bool IsSuccess { get; }
+    [JsonPropertyName("is-success")]
+    public bool IsSuccess { get; set; }
 
     /// <summary>
-    /// Gets the running time of the test.
+    /// Gets or sets the running time of the test.
     /// </summary>
-    public long RunningTime { get; }
+    [JsonPropertyName("running-time")]
+    public long RunningTime { get; set; }
 
     /// <summary>
-    /// Gets an exception was thrown by the test.
+    /// Gets or sets an exception was thrown by the test.
     /// </summary>
-    public Exception? Exception { get; }
+    [JsonIgnore]
+    public Exception? Exception { get; set; }
 
     /// <summary>
-    /// Gets the reason for ignoring this test.
+    /// Gets or sets the reason for ignoring this test.
     /// </summary>
-    public string? ReasonForIgnoring { get; }
+    [JsonPropertyName("reason-for-ignoring")]
+    public string? ReasonForIgnoring { get; set; }
 
     /// <summary>
-    /// Gets comment on the running of this method.
+    /// Gets or sets comment on the running of this method.
     /// </summary>
-    public string? Comment { get; }
+    [JsonPropertyName("comment")]
+    public string? Comment { get; set; }
 }

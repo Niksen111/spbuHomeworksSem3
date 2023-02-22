@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MyNUnit.Info;
 
 /// <summary>
@@ -18,15 +20,18 @@ public class AssemblyTestsInfo
     /// <summary>
     /// Gets Assembly path.
     /// </summary>
+    [JsonPropertyName("assembly-path")]
     public string AssemblyPath { get; }
 
     /// <summary>
     /// Gets ClassesInfo collection.
     /// </summary>
+    [JsonPropertyName("classes-info")]
     public List<ClassTestsInfo> ClassesInfo { get; }
 
     /// <summary>
     /// Gets or sets comment on the testing of this assembly.
     /// </summary>
+    [JsonPropertyName("comment")]
     public string? Comment { get; set; }
 }

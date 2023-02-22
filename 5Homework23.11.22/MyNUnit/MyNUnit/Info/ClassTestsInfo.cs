@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MyNUnit.Info;
 
 /// <summary>
@@ -17,28 +19,33 @@ public class ClassTestsInfo
     }
 
     /// <summary>
-    /// Gets the name of the tested class.
+    /// Gets or sets the name of the tested class.
     /// </summary>
-    public string? ClassName { get; }
+    [JsonPropertyName("class-name")]
+    public string? ClassName { get; set; }
 
     /// <summary>
-    /// Gets a collection of TestInfo of this class.
+    /// Gets or sets a collection of TestInfo of this class.
     /// </summary>
-    public List<TestInfo> TestsInfo { get; }
+    [JsonPropertyName("tests-info")]
+    public List<TestInfo> TestsInfo { get; set; }
 
     /// <summary>
-    /// Gets comments on the testing of this class.
+    /// Gets or sets comments on the testing of this class.
     /// </summary>
-    public List<string> Comments { get; }
+    [JsonPropertyName("comments")]
+    public List<string> Comments { get; set; }
 
     /// <summary>
     /// Gets or sets an exception was thrown by the before/after class methods.
     /// </summary>
+    [JsonIgnore]
     public Exception? Exception { get; set; }
 
     /// <summary>
     /// Gets the cumulative running time of all the tests passed in that class.
     /// </summary>
+    [JsonIgnore]
     public long RunningTime
     {
         get
@@ -56,6 +63,7 @@ public class ClassTestsInfo
     /// <summary>
     /// Gets successful tests count.
     /// </summary>
+    [JsonIgnore]
     public int SuccessfulTestsCount
     {
         get
@@ -76,5 +84,6 @@ public class ClassTestsInfo
     /// <summary>
     /// Gets failed tests count.
     /// </summary>
+    [JsonIgnore]
     public int FailedTestsCount => this.TestsInfo.Count - this.SuccessfulTestsCount;
 }

@@ -1,0 +1,65 @@
+{
+  "class-name": "TestProject.Class1",
+  "tests-info": [
+    {
+      "method-name": "NonStaticAfterClass",
+      "is-success": false,
+      "running-time": 0,
+      "reason-for-ignoring": "Never mind",
+      "comment": null
+    },
+    {
+      "method-name": "After",
+      "is-success": true,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": null
+    },
+    {
+      "method-name": "PassedTest",
+      "is-success": true,
+      "running-time": 1000,
+      "reason-for-ignoring": null,
+      "comment": null
+    },
+    {
+      "method-name": "CheckValueTest",
+      "is-success": true,
+      "running-time": 1000,
+      "reason-for-ignoring": null,
+      "comment": null
+    },
+    {
+      "method-name": "FailedTest",
+      "is-success": false,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": "ERROR: Running of the method failed."
+    },
+    {
+      "method-name": "ThrowsRightException",
+      "is-success": false,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": "ERROR: Running of the method failed."
+    },
+    {
+      "method-name": "TrowsWrongException",
+      "is-success": false,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": "ERROR: Running of the method failed."
+    },
+    {
+      "method-name": "SpecialTest",
+      "is-success": true,
+      "running-time": 1000,
+      "reason-for-ignoring": null,
+      "comment": null
+    }
+  ],
+  "comments": [
+    "ERROR: Founded non-static class with BeforeClassAttribute: NonStaticBeforeClass",
+    "ERROR: Founded non-static class with AfterClassAttribute: NonStaticAfterClass"
+  ]
+}
