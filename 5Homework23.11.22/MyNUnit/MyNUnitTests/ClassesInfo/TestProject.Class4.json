@@ -3,10 +3,10 @@
   "tests-info": [
     {
       "method-name": "EmptyTest",
-      "is-success": true,
+      "is-success": false,
       "running-time": 0,
       "reason-for-ignoring": null,
-      "comment": null
+      "comment": "ERROR: Running the[Before] method FailedBefore failed."
     }
   ],
   "comments": []

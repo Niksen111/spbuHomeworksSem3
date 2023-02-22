@@ -6,11 +6,13 @@ public class Class1
 {
     private static int classValue;
     private int localValue;
+    private int specialValue;
 
 
     public Class1()
     {
         this.localValue = 0;
+        this.specialValue = 0;
     }
 
     [BeforeClass]
@@ -52,7 +54,7 @@ public class Class1
     [After]
     public void SpecialAfter()
     {
-        if (this.localValue == 3)
+        if (this.specialValue == 3)
         {
             throw new InvalidOperationException();
         }
@@ -99,6 +101,6 @@ public class Class1
     public void SpecialTest()
     {
         Thread.Sleep(1000);
-        this.localValue = 3;
+        this.specialValue = 3;
     }
 }

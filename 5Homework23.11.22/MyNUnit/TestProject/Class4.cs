@@ -4,23 +4,18 @@ using MyNUnit.Attributes;
 
 public class Class4
 {
-    private static int localValue;
-
-    public Class4()
-    {
-        localValue = 0;
-    }
+    private static int classValue;
 
     [BeforeClass]
     public static void ChangeLocalValue()
     {
-        localValue = 1;
+        classValue = 100;
     }
 
     [Before]
     public void FailedBefore()
     {
-        if (localValue == 1)
+        if (classValue == 100)
         {
             throw new InvalidOperationException();
         }

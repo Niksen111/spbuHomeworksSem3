@@ -1,6 +1,7 @@
 namespace MyNUnitTests;
 
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MyNUnit;
@@ -10,17 +11,6 @@ using NUnit.Framework;
 public class Tests
 {
     private string classesInfoPath = "../../../ClassesInfo/";
-
-    // [OneTimeSetUp]
-    public void OneTimeSetUp()
-    {
-        if (File.Exists("../../../../TestProject/TestProject.dll"))
-        {
-            File.Delete("../../../../TestProject/TestProject.dll");
-        }
-
-        File.Copy("../../../../TestProject/bin/Debug/net6.0/TestProject.dll", "../../../../TestProject/TestProject.dll");
-    }
 
     [Test]
     public async Task TestProject()
@@ -32,9 +22,14 @@ public class Tests
 
         foreach (var classInfo in info.AssembliesInfo[0].ClassesInfo)
         {
-            await Task.Run(() => this.WriteClassToJsonFile(
-                classInfo,
-                this.classesInfoPath + $"{classInfo.ClassName}.json"));
+            var realClassInfo = await this.GetClassInfoFromJsonFile(this.classesInfoPath + $"{classInfo.ClassName}.json");
+            if (realClassInfo == null)
+            {
+                Assert.Fail();
+                continue;
+            }
+
+            this.CompareClassTestsInfo(realClassInfo, classInfo);
         }
     }
 
@@ -52,10 +47,39 @@ public class Tests
 
     private async Task WriteClassToJsonFile(ClassTestsInfo classInfo, string path)
     {
-        await using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+        File.Delete(path);
+        await using (var fs = File.Open(path, FileMode.OpenOrCreate))
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
             await JsonSerializer.SerializeAsync(fs, classInfo, options);
         }
+    }
+
+    private async Task<ClassTestsInfo?> GetClassInfoFromJsonFile(string path)
+    {
+        await using var fs = File.Open(path, FileMode.Open);
+        return await JsonSerializer.DeserializeAsync<ClassTestsInfo>(fs);
+    }
+
+    private void CompareClassTestsInfo(ClassTestsInfo expected, ClassTestsInfo classInfo)
+    {
+        Assert.AreEqual(expected.ClassName, classInfo.ClassName);
+        Assert.AreEqual(expected.TestsInfo.Count, classInfo.TestsInfo.Count);
+        expected.TestsInfo = expected.TestsInfo.OrderBy(x => x.MethodName).ToList();
+        classInfo.TestsInfo = classInfo.TestsInfo.OrderBy(x => x.MethodName).ToList();
+        for (int i = 0; i < expected.TestsInfo.Count; ++i)
+        {
+            this.CompareTestInfo(expected.TestsInfo[i], classInfo.TestsInfo[i]);
+        }
+
+        Assert.Less(classInfo.RunningTime, 2000);
+    }
+
+    private void CompareTestInfo(TestInfo expected, TestInfo info)
+    {
+        Assert.AreEqual(expected.MethodName, info.MethodName);
+        Assert.AreEqual(expected.Comment, info.Comment);
+        Assert.AreEqual(expected.IsSuccess, info.IsSuccess);
+        Assert.AreEqual(expected.ReasonForIgnoring, info.ReasonForIgnoring);
     }
 }

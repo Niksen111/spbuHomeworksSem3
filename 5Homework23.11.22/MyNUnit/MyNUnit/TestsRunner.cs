@@ -109,7 +109,7 @@ public static class TestsRunner
             summaryInfo.Comment = "Directory is not exist.";
             return summaryInfo;
         }
-        
+
         var testsAssemblies = Directory.EnumerateFiles(pathToAssemblies, "*.dll");
         var assemblies = new List<Task<AssemblyTestsInfo>>();
         foreach (var file in testsAssemblies)
@@ -239,12 +239,14 @@ public static class TestsRunner
             catch (Exception e)
             {
                 classInfo.Exception = e;
-                classInfo.Comments.Add($"ERROR: failed to run the {method.Name} method.");
+                classInfo.Comments.Add($"ERROR: Running the [BeforeClass] method {method.Name} failed.");
                 return classInfo;
             }
         }
 
+        var stopwatch = new Stopwatch();
         var tests = new List<Task<TestInfo>>();
+        stopwatch.Start();
         foreach (var testMethod in testMethods)
         {
             var instance = testClass.IsAbstract && testClass.IsSealed ? null : Activator.CreateInstance(testClass);
@@ -256,6 +258,9 @@ public static class TestsRunner
             classInfo.TestsInfo.Add(await test);
         }
 
+        stopwatch.Stop();
+        classInfo.RunningTime = stopwatch.ElapsedMilliseconds;
+
         foreach (var method in afterClass)
         {
             try
@@ -265,7 +270,7 @@ public static class TestsRunner
             catch (Exception e)
             {
                 classInfo.Exception = e;
-                classInfo.Comments.Add($"ERROR: failed to run the {method.Name} method.");
+                classInfo.Comments.Add($"ERROR: Running the [AfterClass] method {method.Name} failed.");
                 return classInfo;
             }
         }
@@ -286,7 +291,7 @@ public static class TestsRunner
             catch (Exception e)
             {
                 exception = e;
-                return new TestInfo(methodInfo.Name, false, 0, exception, null, $"ERROR: Running the 'before' method {method.Name} failed.");
+                return new TestInfo(methodInfo.Name, false, 0, exception, null, $"ERROR: Running the[Before] method {method.Name} failed.");
             }
         }
 
@@ -298,11 +303,11 @@ public static class TestsRunner
         }
         catch (Exception e)
         {
-            if (exceptedException == null || !e.GetType().IsAssignableTo(exceptedException))
+            if (exceptedException == null || e.InnerException!.GetType() != exceptedException)
             {
                 exception = e;
                 stopwatch.Stop();
-                return new TestInfo(methodInfo.Name, false, 0, exception, null, "ERROR: Running of the method failed.");
+                return new TestInfo(methodInfo.Name, false, 0, exception, null, "ERROR: [Test] method failed.");
             }
         }
 
@@ -316,7 +321,7 @@ public static class TestsRunner
             }
             catch (Exception e)
             {
-                return new TestInfo(methodInfo.Name, false, stopwatch.ElapsedMilliseconds, e, null, $"ERROR: Running the 'after' method {method.Name} failed.");
+                return new TestInfo(methodInfo.Name, false, stopwatch.ElapsedMilliseconds, e, null, $"ERROR: Running the [After] method {method.Name} failed.");
             }
         }
 

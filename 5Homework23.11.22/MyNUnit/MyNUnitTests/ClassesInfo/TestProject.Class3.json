@@ -10,6 +10,6 @@
     }
   ],
   "comments": [
-    "ERROR: failed to run the FailedAfterClass method."
+    "ERROR: Running the [AfterClass] method FailedAfterClass failed."
   ]
 }

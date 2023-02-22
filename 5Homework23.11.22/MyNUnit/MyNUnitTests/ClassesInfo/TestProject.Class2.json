@@ -2,6 +2,6 @@
   "class-name": "TestProject.Class2",
   "tests-info": [],
   "comments": [
-    "ERROR: failed to run the NotWorkingBeforeClass method."
+    "ERROR: Running the [BeforeClass] method NotWorkingBeforeClass failed."
   ]
 }

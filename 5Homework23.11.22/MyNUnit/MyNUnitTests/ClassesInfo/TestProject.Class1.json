@@ -34,28 +34,28 @@
       "is-success": false,
       "running-time": 0,
       "reason-for-ignoring": null,
-      "comment": "ERROR: Running of the method failed."
+      "comment": "ERROR: [Test] method failed."
     },
     {
       "method-name": "ThrowsRightException",
-      "is-success": false,
-      "running-time": 0,
+      "is-success": true,
+      "running-time": 1000,
       "reason-for-ignoring": null,
-      "comment": "ERROR: Running of the method failed."
+      "comment": null
     },
     {
       "method-name": "TrowsWrongException",
       "is-success": false,
       "running-time": 0,
       "reason-for-ignoring": null,
-      "comment": "ERROR: Running of the method failed."
+      "comment": "ERROR: [Test] method failed."
     },
     {
       "method-name": "SpecialTest",
-      "is-success": true,
+      "is-success": false,
       "running-time": 1000,
       "reason-for-ignoring": null,
-      "comment": null
+      "comment": "ERROR: Running the [After] method SpecialAfter failed."
     }
   ],
   "comments": [

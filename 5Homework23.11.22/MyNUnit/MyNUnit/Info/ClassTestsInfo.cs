@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
-
 namespace MyNUnit.Info;
+
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Information about the work of the tests of this class.
@@ -16,6 +16,7 @@ public class ClassTestsInfo
         this.ClassName = className;
         this.TestsInfo = new List<TestInfo>();
         this.Comments = new List<string>();
+        this.RunningTime = 0;
     }
 
     /// <summary>
@@ -43,22 +44,10 @@ public class ClassTestsInfo
     public Exception? Exception { get; set; }
 
     /// <summary>
-    /// Gets the cumulative running time of all the tests passed in that class.
+    /// Gets or sets the summary running time of all the tests in that class.
     /// </summary>
     [JsonIgnore]
-    public long RunningTime
-    {
-        get
-        {
-            long counter = 0;
-            foreach (var test in this.TestsInfo)
-            {
-                counter += test.RunningTime;
-            }
-
-            return counter;
-        }
-    }
+    public long RunningTime { get; set; }
 
     /// <summary>
     /// Gets successful tests count.
