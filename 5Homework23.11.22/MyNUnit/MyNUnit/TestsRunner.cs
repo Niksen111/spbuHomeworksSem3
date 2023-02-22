@@ -2,8 +2,8 @@ namespace MyNUnit;
 
 using System.Diagnostics;
 using System.Reflection;
-using MyNUnit.Attributes;
-using MyNUnit.Info;
+using Attributes;
+using Info;
 
 /// <summary>
 /// Class for running and checking tests.
@@ -26,7 +26,7 @@ public static class TestsRunner
 
         foreach (var assemblyInfo in info.AssembliesInfo)
         {
-            await writer.WriteAsync("    ");
+            await writer.WriteLineAsync("    ASSEMBLY PATH:");
             await writer.WriteLineAsync(assemblyInfo.AssemblyPath);
             if (assemblyInfo.Comment != null)
             {
@@ -39,6 +39,10 @@ public static class TestsRunner
             foreach (var classInfo in assemblyInfo.ClassesInfo)
             {
                 await writer.WriteLineAsync($"  Class: {classInfo.ClassName}");
+                await writer.WriteLineAsync($"Summary running time: {classInfo.RunningTime} ms");
+                await writer.WriteLineAsync($"Successful tests: {classInfo.SuccessfulTestsCount}");
+                await writer.WriteLineAsync($"Failed tests: {classInfo.FailedTestsCount}");
+
                 foreach (var comment in classInfo.Comments)
                 {
                     await writer.WriteLineAsync(comment);
@@ -46,33 +50,37 @@ public static class TestsRunner
 
                 if (classInfo.Exception != null)
                 {
+                    await writer.WriteLineAsync();
+                    await writer.WriteLineAsync("EXCEPTION:");
                     await writer.WriteLineAsync($"{classInfo.Exception}");
+                    await writer.WriteLineAsync();
                     continue;
                 }
 
-                await writer.WriteLineAsync($"Successful tests: {classInfo.SuccessfulTestsCount}");
-                await writer.WriteLineAsync($"Failed tests: {classInfo.FailedTestsCount}");
                 await writer.WriteLineAsync();
 
                 foreach (var testInfo in classInfo.TestsInfo)
                 {
-                    await writer.WriteLineAsync(testInfo.MethodName);
+                    await writer.WriteLineAsync(" Test name: " + testInfo.MethodName);
                     if (testInfo.ReasonForIgnoring != null)
                     {
                         await writer.WriteLineAsync("Test ignored.");
                         await writer.WriteLineAsync(testInfo.ReasonForIgnoring);
+                        await writer.WriteLineAsync();
                         continue;
                     }
 
                     if (testInfo.IsSuccess)
                     {
                         await writer.WriteLineAsync("Test status: Success");
-                        await writer.WriteLineAsync($"Running time: {testInfo.RunningTime}");
+                        await writer.WriteLineAsync($"Running time: {testInfo.RunningTime} ms");
                     }
                     else
                     {
                         await writer.WriteLineAsync("Test status: Failed");
                         await writer.WriteLineAsync(testInfo.Comment);
+                        await writer.WriteLineAsync();
+                        await writer.WriteLineAsync("EXCEPTION:");
                         await writer.WriteLineAsync($"{testInfo.Exception}");
                     }
 
