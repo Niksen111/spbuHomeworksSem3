@@ -106,7 +106,7 @@ public static class TestsRunner
             if (string.CompareOrdinal(Path.GetExtension(pathToAssemblies), ".dll") == 0)
             {
                 var assembly = Assembly.LoadFile(pathToAssemblies);
-                var resultOfAssembly = await AssemblyRun(assembly);
+                var resultOfAssembly = await Task.Run(() => AssemblyRun(assembly), token);
                 summaryInfo.AssembliesInfo.Add(resultOfAssembly);
                 return summaryInfo;
             }
