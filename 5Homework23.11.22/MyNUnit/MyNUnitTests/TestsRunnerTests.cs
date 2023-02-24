@@ -28,10 +28,9 @@ public class Tests
             if (realClassInfo == null)
             {
                 Assert.Fail();
-                continue;
             }
 
-            this.CompareClassTestsInfo(realClassInfo, classInfo);
+            this.CompareClassTestsInfo(realClassInfo!, classInfo);
         }
     }
 
@@ -44,7 +43,7 @@ public class Tests
 
         info = await TestsRunner.RunTests("IncorrectPath");
         Assert.NotNull(info.Comment);
-        Assert.AreEqual("Directory is not exist.", info.Comment);
+        Assert.AreEqual("Directory does not exist.", info.Comment);
     }
 
     private async Task WriteClassToJsonFile(ClassTestsInfo classInfo, string path)

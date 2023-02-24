@@ -114,7 +114,7 @@ public static class TestsRunner
 
         if (!Directory.Exists(pathToAssemblies))
         {
-            summaryInfo.Comment = "Directory is not exist.";
+            summaryInfo.Comment = "Directory does not exist.";
             return summaryInfo;
         }
 
@@ -195,7 +195,7 @@ public static class TestsRunner
                     }
                     else
                     {
-                        classInfo.Comments.Add($"ERROR: Founded non-static class with BeforeClassAttribute: {method.Name}");
+                        classInfo.Comments.Add($"ERROR: Found a non-static class with BeforeClassAttribute: {method.Name}");
                     }
                 }
                 else if (attribute.GetType() == typeof(AfterClassAttribute))
@@ -206,7 +206,7 @@ public static class TestsRunner
                     }
                     else
                     {
-                        classInfo.Comments.Add($"ERROR: Founded non-static class with AfterClassAttribute: {method.Name}");
+                        classInfo.Comments.Add($"ERROR: Found a non-static class with AfterClassAttribute: {method.Name}");
                     }
                 }
                 else if (attribute.GetType() == typeof(BeforeAttribute))
@@ -286,7 +286,7 @@ public static class TestsRunner
         return classInfo;
     }
 
-    private static TestInfo TestRun(object? instance, MethodInfo methodInfo, Type? exceptedException, List<MethodInfo> before, List<MethodInfo> after)
+    private static TestInfo TestRun(object? instance, MethodInfo methodInfo, Type? expectedException, List<MethodInfo> before, List<MethodInfo> after)
     {
         Exception exception;
 
@@ -304,6 +304,7 @@ public static class TestsRunner
         }
 
         var stopwatch = new Stopwatch();
+        var isCaught = false;
         stopwatch.Start();
         try
         {
@@ -311,7 +312,8 @@ public static class TestsRunner
         }
         catch (Exception e)
         {
-            if (exceptedException == null || e.InnerException!.GetType() != exceptedException)
+            isCaught = true;
+            if (expectedException == null || e.InnerException!.GetType() != expectedException)
             {
                 exception = e;
                 stopwatch.Stop();
@@ -320,6 +322,11 @@ public static class TestsRunner
         }
 
         stopwatch.Stop();
+
+        if (expectedException != null && !isCaught)
+        {
+            return new TestInfo(methodInfo.Name, false, stopwatch.ElapsedMilliseconds, null, "ERROR: The expected exception wasn't thrown out.");
+        }
 
         foreach (var method in after)
         {

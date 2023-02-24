@@ -59,7 +59,7 @@
     }
   ],
   "comments": [
-    "ERROR: Founded non-static class with BeforeClassAttribute: NonStaticBeforeClass",
-    "ERROR: Founded non-static class with AfterClassAttribute: NonStaticAfterClass"
+    "ERROR: Found a non-static class with BeforeClassAttribute: NonStaticBeforeClass",
+    "ERROR: Found a non-static class with AfterClassAttribute: NonStaticAfterClass"
   ]
 }

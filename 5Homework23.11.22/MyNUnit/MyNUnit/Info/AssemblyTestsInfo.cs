@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
-
 namespace MyNUnit.Info;
+
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Information about the work of the class tests of this assembly.
