@@ -147,7 +147,7 @@ public static class TestsRunner
 
         foreach (var type in types)
         {
-            if (type.IsClass)
+            if (type.IsClass && ContainsTestMethods(type))
             {
                 classesResults.Add(Task.Run(() => ClassRun(type)));
             }
@@ -185,52 +185,7 @@ public static class TestsRunner
         var testMethods = new List<(MethodInfo Method, Type? Expected)>();
         foreach (var method in methods)
         {
-            foreach (var attribute in Attribute.GetCustomAttributes(method))
-            {
-                if (attribute.GetType() == typeof(BeforeClassAttribute))
-                {
-                    if (method.IsStatic)
-                    {
-                        beforeClass.Add(method);
-                    }
-                    else
-                    {
-                        classInfo.Comments.Add($"ERROR: Found a non-static class with BeforeClassAttribute: {method.Name}");
-                    }
-                }
-                else if (attribute.GetType() == typeof(AfterClassAttribute))
-                {
-                    if (method.IsStatic)
-                    {
-                        afterClass.Add(method);
-                    }
-                    else
-                    {
-                        classInfo.Comments.Add($"ERROR: Found a non-static class with AfterClassAttribute: {method.Name}");
-                    }
-                }
-                else if (attribute.GetType() == typeof(BeforeAttribute))
-                {
-                    before.Add(method);
-                }
-                else if (attribute.GetType() == typeof(AfterAttribute))
-                {
-                    after.Add(method);
-                }
-                else if (attribute.GetType() == typeof(TestAttribute))
-                {
-                    if (((TestAttribute)attribute).Ignore != null)
-                    {
-                        var reasonForIgnoring = ((TestAttribute)attribute).Ignore;
-                        var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
-                        classInfo.TestsInfo.Add(localInfo);
-                    }
-                    else
-                    {
-                        testMethods.Add((method, ((TestAttribute)attribute!).Expected));
-                    }
-                }
-            }
+            DistributeMethod(method, ref classInfo, ref before, ref after, ref beforeClass, ref afterClass, ref testMethods);
         }
 
         if (testMethods.Count == 0)
@@ -257,7 +212,7 @@ public static class TestsRunner
         stopwatch.Start();
         foreach (var testMethod in testMethods)
         {
-            var instance = testClass.IsAbstract && testClass.IsSealed ? null : Activator.CreateInstance(testClass);
+            var instance = testClass is { IsAbstract: true, IsSealed: true } ? null : Activator.CreateInstance(testClass);
             tests.Add(Task.Run(() => TestRun(instance, testMethod.Method, testMethod.Expected, before, after)));
         }
 
@@ -341,5 +296,88 @@ public static class TestsRunner
         }
 
         return new TestInfo(methodInfo.Name, true, stopwatch.ElapsedMilliseconds);
+    }
+
+    private static bool ContainsTestMethods(Type type)
+    {
+        foreach (var method in type.GetMethods())
+        {
+            foreach (var attribute in Attribute.GetCustomAttributes(method))
+            {
+                if (attribute.GetType() == typeof(TestAttribute))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static void DistributeMethod(MethodInfo method, ref ClassTestsInfo classInfo, ref List<MethodInfo> before, ref List<MethodInfo> after, ref List<MethodInfo> beforeClass, ref List<MethodInfo> afterClass, ref List<(MethodInfo Method, Type? Expected)> testMethods)
+    {
+        foreach (var attribute in Attribute.GetCustomAttributes(method))
+        {
+            if (attribute.GetType() == typeof(BeforeClassAttribute))
+            {
+                if (method.IsStatic)
+                {
+                    beforeClass.Add(method);
+                }
+                else
+                {
+                    classInfo.Comments.Add($"ERROR: Found a non-static class with BeforeClassAttribute: {method.Name}");
+                }
+            }
+            else if (attribute.GetType() == typeof(AfterClassAttribute))
+            {
+                if (method.IsStatic)
+                {
+                    afterClass.Add(method);
+                }
+                else
+                {
+                    classInfo.Comments.Add($"ERROR: Found a non-static class with AfterClassAttribute: {method.Name}");
+                }
+            }
+            else if (attribute.GetType() == typeof(BeforeAttribute))
+            {
+                before.Add(method);
+            }
+            else if (attribute.GetType() == typeof(AfterAttribute))
+            {
+                after.Add(method);
+            }
+            else if (attribute.GetType() == typeof(TestAttribute))
+            {
+                if (method.IsStatic || method.GetParameters().Length > 0 || method.ReturnType != typeof(void))
+                {
+                    if (method.IsStatic)
+                    {
+                        classInfo.Comments.Add($"ERROR: Found a static Test method: {method.Name}");
+                    }
+
+                    if (method.GetParameters().Length > 0)
+                    {
+                        classInfo.Comments.Add($"ERROR: Found Test method containing parameters: {method.Name}");
+                    }
+
+                    if (method.ReturnType != typeof(void))
+                    {
+                        classInfo.Comments.Add($"ERROR: Found a method with not void output type: {method.Name}");
+                    }
+                }
+                else if (((TestAttribute)attribute).Ignore != null)
+                {
+                    var reasonForIgnoring = ((TestAttribute)attribute).Ignore;
+                    var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
+                    classInfo.TestsInfo.Add(localInfo);
+                }
+                else
+                {
+                    testMethods.Add((method, ((TestAttribute)attribute!).Expected));
+                }
+            }
+        }
     }
 }

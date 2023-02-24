@@ -2,7 +2,7 @@
   "class-name": "TestProject.Class3",
   "tests-info": [
     {
-      "method-name": "PassingTest",
+      "method-name": "NonStaticPassingTest",
       "is-success": true,
       "running-time": 0,
       "reason-for-ignoring": null,
@@ -10,6 +10,7 @@
     }
   ],
   "comments": [
+    "ERROR: Found a static Test method: PassingTest",
     "ERROR: Running the [AfterClass] method FailedAfterClass failed."
   ]
 }

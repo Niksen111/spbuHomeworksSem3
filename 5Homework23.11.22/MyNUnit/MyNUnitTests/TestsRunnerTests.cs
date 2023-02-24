@@ -1,5 +1,3 @@
-using System;
-
 namespace MyNUnitTests;
 
 using System.IO;
@@ -12,19 +10,28 @@ using NUnit.Framework;
 
 public class Tests
 {
-    private string classesInfoPath = $"../../../ClassesInfo{Path.DirectorySeparatorChar}";
+    private readonly string classesInfoPath = $"../../../ClassesInfo{Path.DirectorySeparatorChar}";
+    private readonly string testProjectPath = "../../../../TestProject";
+
+    // [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        File.Delete(this.testProjectPath + "/TestProject.dll");
+        File.Copy(this.testProjectPath + "/bin/Debug/net6.0/TestProject.dll", this.testProjectPath + "/TestProject.dll");
+    }
 
     [Test]
     public async Task TestProject()
     {
-        var info = await TestsRunner.RunTests("../../../../TestProject");
+        var info = await TestsRunner.RunTests(this.testProjectPath);
         Assert.IsNull(info.Comment);
         Assert.AreEqual(1, info.AssembliesInfo.Count);
         Assert.IsNull(info.AssembliesInfo[0].Comment);
 
         foreach (var classInfo in info.AssembliesInfo[0].ClassesInfo)
         {
-            var realClassInfo = await this.GetClassInfoFromJsonFile(this.classesInfoPath + $"{classInfo.ClassName}.json");
+            // await Task.Run(() => this.WriteClassToJsonFile(classInfo, this.classesInfoPath + $"{classInfo.ClassName}.json"));
+            var realClassInfo = await Task.Run(() => this.GetClassInfoFromJsonFile(this.classesInfoPath + $"{classInfo.ClassName}.json"));
             if (realClassInfo == null)
             {
                 Assert.Fail();
@@ -49,11 +56,9 @@ public class Tests
     private async Task WriteClassToJsonFile(ClassTestsInfo classInfo, string path)
     {
         File.Delete(path);
-        await using (var fs = File.Open(path, FileMode.OpenOrCreate))
-        {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            await JsonSerializer.SerializeAsync(fs, classInfo, options);
-        }
+        await using var fs = File.Open(path, FileMode.OpenOrCreate);
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        await JsonSerializer.SerializeAsync(fs, classInfo, options);
     }
 
     private async Task<ClassTestsInfo?> GetClassInfoFromJsonFile(string path)
@@ -66,6 +71,10 @@ public class Tests
     {
         Assert.AreEqual(expected.ClassName, classInfo.ClassName);
         Assert.AreEqual(expected.TestsInfo.Count, classInfo.TestsInfo.Count);
+        Assert.AreEqual(expected.Comments.Count, classInfo.Comments.Count);
+        expected.Comments.Sort();
+        classInfo.Comments.Sort();
+        Assert.AreEqual(expected.Comments, classInfo.Comments);
         expected.TestsInfo = expected.TestsInfo.OrderBy(x => x.MethodName).ToList();
         classInfo.TestsInfo = classInfo.TestsInfo.OrderBy(x => x.MethodName).ToList();
         for (int i = 0; i < expected.TestsInfo.Count; ++i)
