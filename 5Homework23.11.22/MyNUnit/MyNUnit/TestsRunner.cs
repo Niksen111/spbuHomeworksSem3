@@ -10,6 +10,16 @@ using Info;
 /// </summary>
 public static class TestsRunner
 {
+    private enum TargetSite
+    {
+        Before,
+        After,
+        BeforeClass,
+        AfterClass,
+        Test,
+        No,
+    }
+
     /// <summary>
     /// Generates a report on the running of the tests.
     /// </summary>
@@ -20,7 +30,7 @@ public static class TestsRunner
     {
         if (info.Comment != null)
         {
-            writer.WriteLine(info.Comment);
+            await writer.WriteLineAsync(info.Comment);
             return;
         }
 
@@ -185,7 +195,28 @@ public static class TestsRunner
         var testMethods = new List<(MethodInfo Method, Type? Expected)>();
         foreach (var method in methods)
         {
-            DistributeMethod(method, ref classInfo, ref before, ref after, ref beforeClass, ref afterClass, ref testMethods);
+            foreach (var attribute in Attribute.GetCustomAttributes(method))
+            {
+                var space = DistributeMethod(method, attribute, ref classInfo);
+                switch (space)
+                {
+                    case TargetSite.BeforeClass:
+                        beforeClass.Add(method);
+                        break;
+                    case TargetSite.AfterClass:
+                        afterClass.Add(method);
+                        break;
+                    case TargetSite.Before:
+                        before.Add(method);
+                        break;
+                    case TargetSite.After:
+                        after.Add(method);
+                        break;
+                    case TargetSite.Test:
+                        testMethods.Add((method, ((TestAttribute)attribute).Expected));
+                        break;
+                }
+            }
         }
 
         if (testMethods.Count == 0)
@@ -314,70 +345,65 @@ public static class TestsRunner
         return false;
     }
 
-    private static void DistributeMethod(MethodInfo method, ref ClassTestsInfo classInfo, ref List<MethodInfo> before, ref List<MethodInfo> after, ref List<MethodInfo> beforeClass, ref List<MethodInfo> afterClass, ref List<(MethodInfo Method, Type? Expected)> testMethods)
+    private static TargetSite DistributeMethod(MethodInfo method, Attribute attribute, ref ClassTestsInfo classInfo)
     {
-        foreach (var attribute in Attribute.GetCustomAttributes(method))
+        if (attribute.GetType() == typeof(BeforeClassAttribute))
         {
-            if (attribute.GetType() == typeof(BeforeClassAttribute))
+            if (method.IsStatic)
+            {
+                return TargetSite.BeforeClass;
+            }
+
+            classInfo.Comments.Add($"ERROR: Found a non-static class with BeforeClassAttribute: {method.Name}");
+        }
+        else if (attribute.GetType() == typeof(AfterClassAttribute))
+        {
+            if (method.IsStatic)
+            {
+                return TargetSite.AfterClass;
+            }
+
+            classInfo.Comments.Add($"ERROR: Found a non-static class with AfterClassAttribute: {method.Name}");
+        }
+        else if (attribute.GetType() == typeof(BeforeAttribute))
+        {
+            return TargetSite.Before;
+        }
+        else if (attribute.GetType() == typeof(AfterAttribute))
+        {
+            return TargetSite.After;
+        }
+        else if (attribute.GetType() == typeof(TestAttribute))
+        {
+            if (method.IsStatic || method.GetParameters().Length > 0 || method.ReturnType != typeof(void))
             {
                 if (method.IsStatic)
                 {
-                    beforeClass.Add(method);
+                    classInfo.Comments.Add($"ERROR: Found a static Test method: {method.Name}");
                 }
-                else
-                {
-                    classInfo.Comments.Add($"ERROR: Found a non-static class with BeforeClassAttribute: {method.Name}");
-                }
-            }
-            else if (attribute.GetType() == typeof(AfterClassAttribute))
-            {
-                if (method.IsStatic)
-                {
-                    afterClass.Add(method);
-                }
-                else
-                {
-                    classInfo.Comments.Add($"ERROR: Found a non-static class with AfterClassAttribute: {method.Name}");
-                }
-            }
-            else if (attribute.GetType() == typeof(BeforeAttribute))
-            {
-                before.Add(method);
-            }
-            else if (attribute.GetType() == typeof(AfterAttribute))
-            {
-                after.Add(method);
-            }
-            else if (attribute.GetType() == typeof(TestAttribute))
-            {
-                if (method.IsStatic || method.GetParameters().Length > 0 || method.ReturnType != typeof(void))
-                {
-                    if (method.IsStatic)
-                    {
-                        classInfo.Comments.Add($"ERROR: Found a static Test method: {method.Name}");
-                    }
 
-                    if (method.GetParameters().Length > 0)
-                    {
-                        classInfo.Comments.Add($"ERROR: Found Test method containing parameters: {method.Name}");
-                    }
+                if (method.GetParameters().Length > 0)
+                {
+                    classInfo.Comments.Add($"ERROR: Found Test method containing parameters: {method.Name}");
+                }
 
-                    if (method.ReturnType != typeof(void))
-                    {
-                        classInfo.Comments.Add($"ERROR: Found a method with not void output type: {method.Name}");
-                    }
-                }
-                else if (((TestAttribute)attribute).Ignore != null)
+                if (method.ReturnType != typeof(void))
                 {
-                    var reasonForIgnoring = ((TestAttribute)attribute).Ignore;
-                    var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
-                    classInfo.TestsInfo.Add(localInfo);
+                    classInfo.Comments.Add($"ERROR: Found a method with not void output type: {method.Name}");
                 }
-                else
-                {
-                    testMethods.Add((method, ((TestAttribute)attribute!).Expected));
-                }
+            }
+            else if (((TestAttribute)attribute).Ignore != null)
+            {
+                var reasonForIgnoring = ((TestAttribute)attribute).Ignore;
+                var localInfo = new TestInfo(method.Name, false, 0, null, reasonForIgnoring);
+                classInfo.TestsInfo.Add(localInfo);
+            }
+            else
+            {
+                return TargetSite.Test;
             }
         }
+
+        return TargetSite.No;
     }
 }
