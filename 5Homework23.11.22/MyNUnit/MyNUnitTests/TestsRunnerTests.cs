@@ -30,8 +30,8 @@ public class Tests
 
         foreach (var classInfo in info.AssembliesInfo[0].ClassesInfo)
         {
-            // await Task.Run(() => this.WriteClassToJsonFile(classInfo, this.classesInfoPath + $"{classInfo.ClassName}.json"));
-            var realClassInfo = await Task.Run(() => this.GetClassInfoFromJsonFile(this.classesInfoPath + $"{classInfo.ClassName}.json"));
+            // await this.WriteClassToJsonFile(classInfo, this.classesInfoPath + $"{classInfo.ClassName}.json");
+            var realClassInfo = await this.GetClassInfoFromJsonFile(this.classesInfoPath + $"{classInfo.ClassName}.json");
             if (realClassInfo == null)
             {
                 Assert.Fail();
