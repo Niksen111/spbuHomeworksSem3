@@ -1,0 +1,18 @@
+{
+  "class-name": "TestProject.Class5",
+  "tests-info": [
+    {
+      "method-name": "PassingTest",
+      "is-success": true,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": null
+    }
+  ],
+  "comments": [
+    "ERROR: Found a static Test method: StaticTest",
+    "ERROR: Found a static Test method: StaticReturnsInt",
+    "ERROR: Found a method with not void output type: StaticReturnsInt",
+    "ERROR: Found Test method containing parameters: HasParameters"
+  ]
+}
