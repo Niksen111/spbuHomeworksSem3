@@ -12,7 +12,7 @@ public class Tests
 {
     private readonly string classesInfoPath = $"../../../ClassesInfo{Path.DirectorySeparatorChar}";
     private readonly string testProjectPath = "../../../../TestProject";
-
+    
     public void OneTimeSetUp()
     {
         File.Delete(this.testProjectPath + "/TestProject.dll");
