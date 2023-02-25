@@ -13,7 +13,6 @@ public class Tests
     private readonly string classesInfoPath = $"../../../ClassesInfo{Path.DirectorySeparatorChar}";
     private readonly string testProjectPath = "../../../../TestProject";
 
-    // [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         File.Delete(this.testProjectPath + "/TestProject.dll");
@@ -30,7 +29,6 @@ public class Tests
 
         foreach (var classInfo in info.AssembliesInfo[0].ClassesInfo)
         {
-            // await this.WriteClassToJsonFile(classInfo, this.classesInfoPath + $"{classInfo.ClassName}.json");
             var realClassInfo = await this.GetClassInfoFromJsonFile(this.classesInfoPath + $"{classInfo.ClassName}.json");
             if (realClassInfo == null)
             {

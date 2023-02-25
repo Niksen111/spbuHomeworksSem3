@@ -188,43 +188,18 @@ public static class TestsRunner
     {
         var classInfo = new ClassTestsInfo(testClass.FullName);
         var methods = testClass.GetMethods();
-        var beforeClass = new List<MethodInfo>();
-        var afterClass = new List<MethodInfo>();
-        var before = new List<MethodInfo>();
-        var after = new List<MethodInfo>();
-        var testMethods = new List<(MethodInfo Method, Type? Expected)>();
+        var storage = new MethodsStorage();
         foreach (var method in methods)
         {
-            foreach (var attribute in Attribute.GetCustomAttributes(method))
-            {
-                var space = DistributeMethod(method, attribute, ref classInfo);
-                switch (space)
-                {
-                    case TargetSite.BeforeClass:
-                        beforeClass.Add(method);
-                        break;
-                    case TargetSite.AfterClass:
-                        afterClass.Add(method);
-                        break;
-                    case TargetSite.Before:
-                        before.Add(method);
-                        break;
-                    case TargetSite.After:
-                        after.Add(method);
-                        break;
-                    case TargetSite.Test:
-                        testMethods.Add((method, ((TestAttribute)attribute).Expected));
-                        break;
-                }
-            }
+            storage.DistributeMethod(method, ref classInfo);
         }
-
-        if (testMethods.Count == 0)
+        
+        if (storage.TestMethods.Count == 0)
         {
             return null;
         }
 
-        foreach (var method in beforeClass)
+        foreach (var method in storage.BeforeClass)
         {
             try
             {
@@ -241,10 +216,10 @@ public static class TestsRunner
         var stopwatch = new Stopwatch();
         var tests = new List<Task<TestInfo>>();
         stopwatch.Start();
-        foreach (var testMethod in testMethods)
+        foreach (var testMethod in storage.TestMethods)
         {
             var instance = testClass is { IsAbstract: true, IsSealed: true } ? null : Activator.CreateInstance(testClass);
-            tests.Add(Task.Run(() => TestRun(instance, testMethod.Method, testMethod.Expected, before, after)));
+            tests.Add(Task.Run(() => TestRun(instance, testMethod.Method, testMethod.Expected, storage.Before.ToList(), storage.After.ToList())));
         }
 
         foreach (var test in tests)
@@ -255,7 +230,7 @@ public static class TestsRunner
         stopwatch.Stop();
         classInfo.RunningTime = stopwatch.ElapsedMilliseconds;
 
-        foreach (var method in afterClass)
+        foreach (var method in storage.AfterClass)
         {
             try
             {
@@ -311,7 +286,7 @@ public static class TestsRunner
 
         if (expectedException != null && !isCaught)
         {
-            return new TestInfo(methodInfo.Name, false, stopwatch.ElapsedMilliseconds, null, "ERROR: The expected exception wasn't thrown out.");
+            return new TestInfo(methodInfo.Name, false, stopwatch.ElapsedMilliseconds, null, "ERROR: The expected exception wasn't thrown.");
         }
 
         foreach (var method in after)
@@ -405,5 +380,53 @@ public static class TestsRunner
         }
 
         return TargetSite.No;
+    }
+
+    private class MethodsStorage
+    {
+        public MethodsStorage()
+        {
+            this.BeforeClass = new List<MethodInfo>();
+            this.AfterClass = new List<MethodInfo>();
+            this.Before = new List<MethodInfo>();
+            this.After = new List<MethodInfo>();
+            this.TestMethods = new List<(MethodInfo Method, Type? Expected)>();
+        }
+
+        public List<MethodInfo> BeforeClass { get; set; }
+
+        public List<MethodInfo> AfterClass { get; set; }
+
+        public List<MethodInfo> Before { get; set; }
+
+        public List<MethodInfo> After { get; private set; }
+
+        public List<(MethodInfo Method, Type? Expected)> TestMethods { get; set; }
+
+        public void DistributeMethod(MethodInfo method, ref ClassTestsInfo classInfo)
+        {
+            foreach (var attribute in Attribute.GetCustomAttributes(method))
+            {
+                var site = TestsRunner.DistributeMethod(method, attribute, ref classInfo);
+                switch (site)
+                {
+                    case TargetSite.BeforeClass:
+                        this.BeforeClass.Add(method);
+                        break;
+                    case TargetSite.AfterClass:
+                        this.AfterClass.Add(method);
+                        break;
+                    case TargetSite.Before:
+                        this.Before.Add(method);
+                        break;
+                    case TargetSite.After:
+                        this.After.Add(method);
+                        break;
+                    case TargetSite.Test:
+                        this.TestMethods.Add((method, ((TestAttribute)attribute).Expected));
+                        break;
+                }
+            }
+        }
     }
 }
