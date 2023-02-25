@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrix", "Matrix\Matrix.csproj", "{795E88EF-60E8-4858-B963-A8D78A56C80E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTests", "MatrixTests\MatrixTests.csproj", "{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixMultiplicationGetStatistics", "MatrixMultiplicationGetStatistics\MatrixMultiplicationGetStatistics.csproj", "{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{795E88EF-60E8-4858-B963-A8D78A56C80E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{795E88EF-60E8-4858-B963-A8D78A56C80E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{795E88EF-60E8-4858-B963-A8D78A56C80E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{795E88EF-60E8-4858-B963-A8D78A56C80E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E9B2AD2-DCFD-4A97-9A9B-D08A73D68F03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F3D55D8-7D8E-4B44-A77D-DBA38BFEF04F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
