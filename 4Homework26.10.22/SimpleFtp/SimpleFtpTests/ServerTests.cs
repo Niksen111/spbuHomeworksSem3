@@ -45,7 +45,7 @@ public class ServerTests
         writer.WriteLine("1 ../");
         writer.Flush();
         response = reader.ReadLine();
-        Assert.AreEqual("1 ../net6.0 true ", response);
+        Assert.AreEqual("1 ../net7.0 true ", response);
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class ServerTests
         writer2.WriteLine("1 ../");
         writer2.Flush();
         response = reader2.ReadLine();
-        Assert.AreEqual("1 ../net6.0 true ", response);
+        Assert.AreEqual("1 ../net7.0 true ", response);
 
         writer3.WriteLine("1 ../../");
         writer3.Flush();
@@ -101,7 +101,7 @@ public class ServerTests
         writer2.WriteLine("1 ../");
         writer2.Flush();
         response = reader2.ReadLine();
-        Assert.AreEqual("1 ../net6.0 true ", response);
+        Assert.AreEqual("1 ../net7.0 true ", response);
         Assert.IsTrue(this.server!.IsWorking);
     }
 
