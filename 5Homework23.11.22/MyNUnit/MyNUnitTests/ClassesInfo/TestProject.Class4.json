@@ -1,0 +1,13 @@
+{
+  "class-name": "TestProject.Class4",
+  "tests-info": [
+    {
+      "method-name": "EmptyTest",
+      "is-success": false,
+      "running-time": 0,
+      "reason-for-ignoring": null,
+      "comment": "ERROR: Running the[Before] method FailedBefore failed."
+    }
+  ],
+  "comments": []
+}
