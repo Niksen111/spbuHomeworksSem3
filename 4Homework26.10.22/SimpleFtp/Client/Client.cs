@@ -140,7 +140,7 @@ public class Client
     /// <summary>
     /// Abstraction of directory contents (files or directories).
     /// </summary>
-    public struct Record
+    public record struct Record
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Record"/> struct.
