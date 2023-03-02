@@ -140,36 +140,10 @@ public class Client
     /// <summary>
     /// Abstraction of directory contents (files or directories).
     /// </summary>
-    public record struct Record
+    /// <param name="Name">Record name.</param>
+    /// <param name="IsDirectory">Gets true if the record is directory.</param>
+    public record Record(string Name, bool IsDirectory)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Record"/> struct.
-        /// </summary>
-        /// <param name="name">Record name.</param>
-        /// <param name="isDirectory">A value indicating whether the record is a directory.</param>
-        public Record(string name, bool isDirectory)
-        {
-            this.Name = name;
-            this.IsDirectory = isDirectory;
-        }
-
-        /// <summary>
-        /// Gets record name.
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether gets true if the record is directory.
-        /// </summary>
-        public bool IsDirectory { get; }
-
-        /// <summary>
-        /// Converts DirectoryContent to string.
-        /// </summary>
-        /// <returns>String version of the DirectoryContent.</returns>
-        public override string ToString()
-        {
-            return this.Name + (this.IsDirectory ? " true " : " false ");
-        }
+        public override string ToString() => Name + (IsDirectory ? " true " : " false ");
     }
 }
