@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Test
 {
     [Column("id_test")]
-    public int IdTest { get; set; }
+    public int TestId { get; set; }
 
     [Column("id_assembly")]
-    public int IdAssembly { get; set; }
+    public int AssemblyId { get; set; }
 
     [Column("name")]
     public string Name { get; set; }

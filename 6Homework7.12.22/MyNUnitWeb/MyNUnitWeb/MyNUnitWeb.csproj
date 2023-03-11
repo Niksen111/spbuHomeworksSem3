@@ -14,15 +14,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0-preview.1.23111.4" />
-      <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+      <Folder Include="Data" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\5Homework23.11.22\MyNUnit\MyNUnit\MyNUnit.csproj" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0-preview.1.23111.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="8.0.0-preview.1.23111.4" />
+      <PackageReference Include="SQLite" Version="3.13.0" />
     </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Assembly
 {
     [Column("id_assembly")]
-    public int Id { get; set; }
+    public int AssemblyId { get; set; }
 
     [Column("test_count")]
     public int TestsCount { get; set; }
