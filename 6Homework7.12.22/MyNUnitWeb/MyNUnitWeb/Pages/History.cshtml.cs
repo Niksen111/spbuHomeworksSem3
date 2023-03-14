@@ -6,21 +6,26 @@ namespace MyNUnitWeb.Pages;
 
 public class History : PageModel
 {
-    public void OnGet()
-    {
-        
-    }
+    private readonly TestingDataDbContext context;
+    
+    public History(TestingDataDbContext context) 
+        => this.context = context;
 
-    public List<Assembly> GetAssemblies(int assemblyCount)
+    public IList<Data.Assembly> Assemblies { get; private set; } = new List<Data.Assembly>();
+    
+    public List<Data.Assembly> GetAssemblies(int assemblyCount = -1)
     {
         using var context = new TestingDataDbContext(new DbContextOptions<TestingDataDbContext>());
+        if (assemblyCount == -1)
+        {
+            return context.Assemblies.OrderByDescending(assembly => assembly.AssemblyId).Select(t => t).ToList();
+        }
+        
         return context.Assemblies.OrderByDescending(assembly => assembly.AssemblyId).Take(assemblyCount).ToList();
     }
     
-    public List<Test> GetTests(int assemblyId)
+    public void OnGet()
     {
-
-        using var context = new TestingDataDbContext(new DbContextOptions<TestingDataDbContext>());
-        return context.Tests.Where(test => test.AssemblyId == assemblyId).Select(test => test).ToList();
+        Assemblies = GetAssemblies();
     }
 }

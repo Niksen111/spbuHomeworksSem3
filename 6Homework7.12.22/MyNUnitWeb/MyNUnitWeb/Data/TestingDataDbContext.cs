@@ -9,7 +9,7 @@ public class TestingDataDbContext : DbContext
     {
     }
 
-    public DbSet<Assembly> Assemblies => Set<Assembly>();
+    public DbSet<Assembly> Assemblies { get; set; }
 
-    public DbSet<Test> Tests => Set<Test>();
+    public DbSet<Test> Tests { get; set; }
 }

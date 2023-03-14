@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MyNUnit;
 
 namespace MyNUnitWeb.Pages;
 
@@ -14,5 +15,13 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
+    }
+
+    public async Task Run()
+    {
+        var files = "Path-to-uploaded-files";
+        var result = await Task.Run(() => TestsRunner.RunTests(files));
+        // Add new record to db
+        // 
     }
 }

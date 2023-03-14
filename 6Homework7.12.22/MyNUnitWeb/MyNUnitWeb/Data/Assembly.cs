@@ -6,6 +6,9 @@ public class Assembly
 {
     [Column("id_assembly")]
     public int AssemblyId { get; set; }
+    
+    [Column("name")]
+    public string Name { get; set; }
 
     [Column("test_count")]
     public int TestsCount { get; set; }

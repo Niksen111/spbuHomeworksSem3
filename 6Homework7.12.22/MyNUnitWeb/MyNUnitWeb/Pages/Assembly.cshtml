@@ -1,0 +1,29 @@
+@page "{assmeblyId}"
+@model MyNUnitWeb.Pages.Assembly
+
+@{
+    ViewData["Title"] = "Assembly";
+}
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Test name</th>
+        <th>Is passed</th>
+        <th>Running time</th>
+        <th>Reason for ignoring</th>
+        <th>Comment</th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (Data.Test t in Model.Tests) {
+            <tr>
+                <td>@t.Name</td>
+                <td>@(t.IsPassed ? "Yes" : "No")</td>
+                <td>@t.RunningTime</td>
+                <td>@t.ReasonForIgnoring</td>
+                <td>@t.Comment</td>
+            </tr>
+        }
+    </tbody>
+</table>

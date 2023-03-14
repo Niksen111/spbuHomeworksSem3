@@ -4,3 +4,27 @@
 @{
     ViewData["Title"] = "History";
 }
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Assembly name</th>
+        <th>Tests count</th>
+        <th>Passed</th>
+        <th>Failed</th>
+        <th>Ignored</th>
+        <th>Date and Time</th>
+    </tr>
+    </thead>
+    <tbody>
+            @foreach (Data.Assembly t in Model.Assemblies) {
+                <tr>
+                    <td>@t.Name</td>
+                    <td>@t.Passed</td>
+                    <td>@t.Failed</td>
+                    <td>@t.Ignored</td>
+                    <td>@t.Datetime</td>
+                </tr>
+            }
+        </tbody>
+</table>

@@ -3,11 +3,12 @@ using MyNUnitWeb.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<TestingDataDbContext>(options =>
-    options.UseSqlite("Data Source=../Data/testing-data.sqlite"));
-
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddDbContext<TestingDataDbContext>(options =>
+    options.UseSqlite("Data Source=../Data/testing-data.db"));
+
 
 //builder.Services.AddDbContext<TestingDataDbContext>(options =>
 //    options.UseSqlite("Data Source=conferenceRegistration.db"));
