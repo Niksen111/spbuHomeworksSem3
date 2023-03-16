@@ -1,5 +1,4 @@
 #SPbU-CSharp-course
-[![.github/workflows/CI.yml]](https://github.com/YuriUfimtsev/SPbU-CSharp-course/actions/workflows/CI.yml)
 
 Repository with C# programming homework for the 3rd semester of SPbSU.
 
