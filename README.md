@@ -1,4 +1,4 @@
-##SPbU-CSharp-course
+# SPbU-CSharp-course
 
 Repository with C# programming homework for the 3rd semester of SPbSU.
 
