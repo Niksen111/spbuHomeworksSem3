@@ -1,6 +1,6 @@
 # SPbU-CSharp-course
 
-Repository with C# programming homework for the 3rd semester of SPbSU.
+The basics of multithreaded programming, networks, reflection in C#.
 
 ### Task navigation
 #### Homeworks
