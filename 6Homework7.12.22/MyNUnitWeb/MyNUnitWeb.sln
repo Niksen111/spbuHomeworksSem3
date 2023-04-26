@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNUnitWeb", "MyNUnitWeb\MyNUnitWeb.csproj", "{3FEAAE92-D751-4E3D-9981-F689E9356C25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyNUnit", "..\..\5Homework23.11.22\MyNUnit\MyNUnit\MyNUnit.csproj", "{E2F7FBFB-7BCE-4825-B0AA-DF4651B9C9C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FEAAE92-D751-4E3D-9981-F689E9356C25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FEAAE92-D751-4E3D-9981-F689E9356C25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FEAAE92-D751-4E3D-9981-F689E9356C25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FEAAE92-D751-4E3D-9981-F689E9356C25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2F7FBFB-7BCE-4825-B0AA-DF4651B9C9C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F7FBFB-7BCE-4825-B0AA-DF4651B9C9C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2F7FBFB-7BCE-4825-B0AA-DF4651B9C9C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2F7FBFB-7BCE-4825-B0AA-DF4651B9C9C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
